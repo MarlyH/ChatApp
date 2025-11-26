@@ -1,3 +1,5 @@
+using ChatApp.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp
 {
@@ -8,6 +10,11 @@ namespace ChatApp
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+
+            builder.Services.AddDbContext<ChatDbContext>(options =>
+            {
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConn"));
+            });
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

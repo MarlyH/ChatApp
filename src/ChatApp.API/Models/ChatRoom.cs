@@ -1,4 +1,4 @@
-﻿namespace Chatroom.Models
+﻿namespace ChatApp.Domain.Models
 {
     public class ChatRoom
     {
