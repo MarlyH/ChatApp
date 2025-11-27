@@ -1,3 +1,4 @@
+using ChatApp.API.Repositories;
 using ChatApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,8 +16,10 @@ namespace ChatApp
             {
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConn"));
             });
+            builder.Services.AddScoped<ChatRoomRepository>();
 
             builder.Services.AddControllers();
+            builder.Services.AddSwaggerGen();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
@@ -25,7 +28,8 @@ namespace ChatApp
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();
