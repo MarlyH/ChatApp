@@ -1,5 +1,6 @@
 ﻿using ChatApp.API.DTOs;
 using ChatApp.API.Services;
+using ChatApp.Domain.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,23 +16,25 @@ namespace ChatApp.API.Controllers
         {
             _chatRoomService = chatRoomService;
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateRoom([FromBody] CreateRoomRequest dto)
         {
+            ChatRoom newChatRoom;
             try
             {
-                await _chatRoomService.CreateRoom(dto);
+                newChatRoom = await _chatRoomService.CreateRoom(dto);
             }
             catch (InvalidOperationException ex)
             {
-                return Conflict(new { message = ex.Message });
+                return Conflict(new { success = false, message = ex.Message });
             }
             catch
             {
                 throw; // to global handler.
             }
             
-            return Ok("Room successfully craeted");
+            return Ok(new { success = true, message = "Chatroom successfully created.", roomId = newChatRoom.Id });
         }
     }
 }
