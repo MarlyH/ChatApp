@@ -14,6 +14,10 @@ namespace ChatApp.API.Services
             _repo = repo;
         }
 
+        /// <summary>
+        /// Creates a new chat room with the specified name and privacy setting.
+        /// </summary>
+        /// <returns>The newly created <see cref="ChatRoom"/>.</returns>
         public async Task<ChatRoom> CreateRoom([FromBody] CreateRoomRequest dto)
         {
             string slug = GenerateSlug(dto.Name);

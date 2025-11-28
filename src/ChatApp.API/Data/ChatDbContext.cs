@@ -1,12 +1,11 @@
-﻿using ChatApp.Domain.Models;
+﻿using ChatApp.API.Models;
+using ChatApp.Domain.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ChatApp.Infrastructure.Data
 {
-    public class ChatDbContext : DbContext
+    public class ChatDbContext : IdentityDbContext<AppUser>
     {
         public ChatDbContext(DbContextOptions<ChatDbContext> options) : base(options) { }
 
