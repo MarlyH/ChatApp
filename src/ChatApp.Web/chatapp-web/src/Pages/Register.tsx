@@ -1,4 +1,7 @@
 import { useState } from "react";
+import UsernameInput from "../Components/UsernameInput.tsx";
+import EmailInput from "../Components/EmailInput.tsx";
+import PasswordInput from "../Components/PasswordInput.tsx";
 
 interface RegisterRequest {
     username: string;
@@ -50,18 +53,20 @@ export default function Register() {
 
     return (
         <form onSubmit={handleSubmit}>
-            <input name="username" value={form.username} onChange={handleChange} placeholder="Username" required />
-            <input name="email" value={form.email} onChange={handleChange} placeholder="Email" required />
-            <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="Password" required />
-            <button type="submit">Register</button>
+            <UsernameInput value={form.username} name={"username"} onChange={handleChange} />
+            <EmailInput value={form.email} name={"email"} onChange={handleChange} />
+            <PasswordInput value={form.password} name={"password"} onChange={handleChange} />
+            <button className="btn btn-soft btn-primary" type="submit">
+                {loading && (
+                    <span className="loading loading-spinner"></span>
+                )}
+                Register
+            </button>
 
             {errors.length > 0 && (
                 <ul className={"text-red-700"}>
                     {errors.map((err, i) => <li key={i}>{err}</li>)}
                 </ul>
-            )}
-            {loading && (
-                <p>Loading...</p>
             )}
         </form>
     );
