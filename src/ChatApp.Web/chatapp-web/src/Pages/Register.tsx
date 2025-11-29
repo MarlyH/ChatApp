@@ -29,22 +29,40 @@ export default function Register() {
         setLoading(true);
 
         try {
-            const res = await fetch("https://localhost:7073/api/user", {
+            const registerRes = await fetch("https://localhost:7073/api/user/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form),
                 credentials: "include"
             });
 
-            if (!res.ok) {
-                const data = await res.json();
+            if (!registerRes.ok) {
+                const data = await registerRes.json();
                 // flatten any validation errors returned by API and cast as string.
                 const flattenedErrors = Object.values(data.errors).flat().map(e => String(e));
                 setErrors(flattenedErrors);
             } else {
-                alert("User successfully registered");
-                setForm({username: "", email: "", password: "", });
-                // TODO: call login endpoint automatically after successful register.
+                //setForm({username: "", email: "", password: "", });
+                // For now we are just automatically logging in. The actual intended flow is:
+                // TODO: redirect to login page and send registration email to user
+                const loginRes = await fetch('https://localhost:7073/api/User/login', {
+                    method: 'POST',
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: form.username,
+                        password: form.password,
+                        isPersistent: false
+                    }),
+                    credentials: "include"
+                });
+                if (loginRes.ok) {
+                    alert("login successfully registered");
+                } else if (loginRes.status === 403) {
+                    setErrors(["Successfully registered but issue encountered logging in."])
+                    // TODO: redirect to login screen for manual login.
+                } else {
+                    setErrors(["Something went wrong"]);
+                }
             }
         } catch {
             setErrors(["Something went wrong"]);

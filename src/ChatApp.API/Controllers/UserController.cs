@@ -18,7 +18,7 @@ namespace ChatApp.API.Controllers
             _userService = userService;
         }
 
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest dto)
         {
             CreateUserResult result = await _userService.CreateNewUserAsync(dto);
@@ -28,6 +28,19 @@ namespace ChatApp.API.Controllers
             }
 
             return Ok("User successfully created.");
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest dto)
+        {
+            var signInResult = await _userService.LoginAsync(dto); 
+            
+            if (signInResult.Succeeded) 
+            {
+                return Ok("Login successful");
+            }
+
+            return Unauthorized(new { message = "Incorrect password." });
         }
     }
 }
