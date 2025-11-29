@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ChatApp.API.Models;
 using ChatApp.API.Services;
+using Scalar.AspNetCore;
 
 namespace ChatApp
 {
@@ -46,10 +47,9 @@ namespace ChatApp
             builder.Services.AddScoped<UserService>();
 
             builder.Services.AddControllers();
-            builder.Services.AddSwaggerGen();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
-
+            
             builder.Services.AddProblemDetails();
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
@@ -69,8 +69,11 @@ namespace ChatApp
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                app.MapOpenApi();
+                app.MapScalarApiReference(options =>
+                {
+                    options.WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Fetch);
+                });
             }
 
             app.UseExceptionHandler();
