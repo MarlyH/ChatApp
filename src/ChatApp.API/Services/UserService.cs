@@ -8,10 +8,12 @@ namespace ChatApp.API.Services
     public class UserService
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
 
-        public UserService(UserManager<AppUser> userManager)
+        public UserService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         /// <summary>
@@ -45,6 +47,11 @@ namespace ChatApp.API.Services
                 Succeeded = true,
                 User = newUser
             };
+        }
+
+        public async Task<SignInResult> LoginAsync(LoginRequest dto)
+        {
+            return await _signInManager.PasswordSignInAsync(dto.Username, dto.Password, dto.IsPersistent, false);
         }
     }
 }

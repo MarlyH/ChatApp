@@ -34,6 +34,13 @@ namespace ChatApp
                 options.Password.RequiredUniqueChars = 1;
             }).AddEntityFrameworkStores<ChatDbContext>();
 
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = SameSiteMode.None; // REQUIRED for localhost HTTPS + frontend
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            });
+
             builder.Services.AddScoped<ChatRoomRepository>();
             builder.Services.AddScoped<ChatRoomService>();
             builder.Services.AddScoped<UserService>();
@@ -50,9 +57,10 @@ namespace ChatApp
             {
                 options.AddDefaultPolicy(policy =>
                 {
-                    policy.AllowAnyOrigin()
+                    policy.WithOrigins("http://localhost:5173")
                     .AllowAnyMethod()
-                    .AllowAnyHeader();
+                    .AllowAnyHeader()
+                    .AllowCredentials();
                 });
             });
 
@@ -71,6 +79,7 @@ namespace ChatApp
 
             app.UseCors();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();

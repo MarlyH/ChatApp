@@ -33,6 +33,7 @@ export default function Register() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form),
+                credentials: "include"
             });
 
             if (!res.ok) {
@@ -43,6 +44,7 @@ export default function Register() {
             } else {
                 alert("User successfully registered");
                 setForm({username: "", email: "", password: "", });
+                // TODO: call login endpoint automatically after successful register.
             }
         } catch {
             setErrors(["Something went wrong"]);
