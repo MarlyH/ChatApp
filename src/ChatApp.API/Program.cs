@@ -24,7 +24,7 @@ namespace ChatApp
             {
                 options.SignIn.RequireConfirmedAccount = true;
                 options.User.RequireUniqueEmail = true;
-
+                
                 // Password settings turned off for dev.
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
@@ -36,6 +36,7 @@ namespace ChatApp
 
             builder.Services.AddScoped<ChatRoomRepository>();
             builder.Services.AddScoped<ChatRoomService>();
+            builder.Services.AddScoped<UserService>();
 
             builder.Services.AddControllers();
             builder.Services.AddSwaggerGen();
