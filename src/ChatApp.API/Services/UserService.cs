@@ -51,35 +51,15 @@ namespace ChatApp.API.Services
                 };
             }
 
-            // Generate email confirmation token and link
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
-            var apiUrl = _configuration.GetValue<string>("ApiUrl");
-            var confirmLink = $"{apiUrl}/api/user/confirm-email?userId={newUser.Id}&token={Uri.EscapeDataString(token)}";
-
-            try
+            // Send confirmation email and roll back user creation if it fails
+            var emailResult = await SendConfirmationEmailAsync(newUser);
+            if (!emailResult.Succeeded)
             {
-                // Send confirmation email
-                await _emailService.SendEmailAsync(
-                    newUser.Email,
-                    "Confirm your ChatApp account",
-                    $@"
-                    <p>Welcome, {newUser.UserName}!</p>
-                    <p>Please confirm your email by clicking the link below:</p>
-                    <p><a href=""{confirmLink}"">Confirm Email</a></p>
-                    <p>If you didn't create this account, you can ignore this email.</p>
-                "
-                );
-            }
-            catch (Exception ex)
-            {
-                // Rollback user creation if email fails
                 await _userManager.DeleteAsync(newUser);
-                _logger.LogError(ex, $"Failed to send confirmation email for user {newUser.Id}.");
-
                 return new ServiceResult<AppUser>
                 {
                     Succeeded = false,
-                    Errors = new List<string> { "Something went wrong during registration. Please try again later." }
+                    Errors = new List<string> { emailResult.Message }
                 };
             }
 
@@ -90,9 +70,61 @@ namespace ChatApp.API.Services
             };
         }
 
+        public async Task<ServiceResult> ResendConfirmation(ResendConfirmationRequest dto)
+        {
+            AppUser user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = "User not found."
+                };
+            }
+
+            return await SendConfirmationEmailAsync(user);
+        }
+
         public async Task<SignInResult> LoginAsync(LoginRequest dto)
         {
             return await _signInManager.PasswordSignInAsync(dto.Username, dto.Password, dto.IsPersistent, false);
+        }
+
+        /// <summary>
+        /// Sends a confirmation email to the specified user.
+        /// </summary>
+        public async Task<ServiceResult> SendConfirmationEmailAsync(AppUser user)
+        {
+            if (user.EmailConfirmed) 
+            { 
+                return new ServiceResult { Succeeded = false, Message = "Email already confirmed." }; 
+            }
+
+            // Generate email confirmation token and link
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var apiUrl = _configuration.GetValue<string>("ApiUrl");
+            var confirmLink = $"{apiUrl}/api/user/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(token)}";
+
+            // Send the confirmation email
+            try
+            {
+                await _emailService.SendEmailAsync(
+                    user.Email,
+                    "Confirm your ChatApp account",
+                    $@"
+                    <p>Welcome, {user.UserName}!</p>
+                    <p>Please confirm your email by clicking the link below:</p>
+                    <p><a href=""{confirmLink}"">Confirm Email</a></p>
+                    <p>If you didn't create this account, you can ignore this email.</p>"
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to send confirmation email for user {user.Id}.");
+                return new ServiceResult { Succeeded = false, Message = "Failed to send confirmation email." };
+            }
+
+            return new ServiceResult { Succeeded = true, Message = "Confirmation email sent." };
         }
 
         /// <summary>

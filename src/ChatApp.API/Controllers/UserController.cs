@@ -1,5 +1,6 @@
 ﻿using ChatApp.API.DTOs;
 using ChatApp.API.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.API.Controllers
@@ -51,5 +52,18 @@ namespace ChatApp.API.Controllers
 
             return Ok(new { message = result.Message });
         }
+
+        [HttpPost("resend-confirmation")]
+        public async Task<IActionResult> ResendConfirmation([FromBody] ResendConfirmationRequest dto)
+        {
+            var result = await _userService.ResendConfirmation(dto);
+            if (!result.Succeeded)
+            {
+                return BadRequest(new { message = result.Message });
+            }
+
+            return Ok(new { message = result.Message });
+        }
+
     }
 }

@@ -18,7 +18,9 @@ export default function RegisterModal() {
 
     const [errors, setErrors] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
-    const [success, setSuccess] = useState(false);
+    const [formSuccess, setFormSuccess] = useState(false);
+    const [registeredEmail, setRegisteredEmail] = useState<string>("");
+    const [emailResent, setEmailResent] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -44,8 +46,9 @@ export default function RegisterModal() {
                 setErrors(flattenedErrors);
             } else {
                 // clear form and show success msg
+                setRegisteredEmail(form.email);
                 setForm({username: "", email: "", password: "", });
-                setSuccess(true);
+                setFormSuccess(true);
             }
         } catch {
             setErrors(["Something went wrong"]);
@@ -53,6 +56,32 @@ export default function RegisterModal() {
             setLoading(false);
         }
     };
+
+    const resendEmail = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch('https://localhost:7073/api/User/resend-confirmation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: registeredEmail
+                })
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                setErrors([data.message]);
+            } else {
+                setEmailResent(true);
+            }
+        } catch {
+            setErrors(["Something went wrong"]);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <>
@@ -74,40 +103,47 @@ export default function RegisterModal() {
                     <div className="flex flex-col gap-4">
                         <h2 className="font-bold text-xl">Sign Up!</h2>
 
-                        <form onSubmit={handleSubmit} className="gap-2">
-                            <UsernameInput value={form.username} name={"username"} onChange={handleChange} />
-                            <EmailInput value={form.email} name={"email"} onChange={handleChange} />
-                            <PasswordInput value={form.password} name={"password"} onChange={handleChange} />
-                            <button className="btn btn-soft btn-primary" type="submit" disabled={success}>
-                                {loading && (
-                                    <span className="loading loading-spinner"></span>
-                                )}
-                                Register
-                            </button>
-                        </form>
-
-                        {errors.length > 0 && (
-                            <ul className={"text-red-700"}>
-                                {errors.map((err, i) => <li key={i}>{err}</li>)}
-                            </ul>
-                        )}
-
-                        {success && (
+                        {/* When form submits with a 200 response, hide it and show confirmation text. */}
+                        {!formSuccess ? (
+                            <form onSubmit={handleSubmit} className="gap-2">
+                                <UsernameInput value={form.username} name={"username"} onChange={handleChange} />
+                                <EmailInput value={form.email} name={"email"} onChange={handleChange} />
+                                <PasswordInput value={form.password} name={"password"} onChange={handleChange} />
+                                <button className="btn btn-soft btn-primary mt-4" type="submit" disabled={formSuccess}>
+                                    {loading && (
+                                        <span className="loading loading-spinner"></span>
+                                    )}
+                                    Register
+                                </button>
+                            </form>
+                        ) : (
                             <div className="p-4 bg-green-100 border border-green-300 rounded-md text-green-800">
                                 <p>
-                                    Registration successful! We’ve sent a confirmation email to <strong>{form.email}</strong>.
+                                    Registration successful! We’ve sent a confirmation email to <strong>{registeredEmail}</strong>.
                                     Please check your inbox and click the link to activate your account.
                                 </p>
                                 <p className="mt-2">
                                     Didn’t receive the email?{' '}
                                     <span
-                                        //onClick={resendEmail}
+                                        onClick={resendEmail}
                                         className="text-blue-600 hover:underline cursor-pointer"
                                     >
                                         Resend confirmation email
                                     </span>
                                 </p>
+                                {emailResent && (
+                                    <p className="mt-2">Confirmation email resent!</p>
+                                )}
+                                {loading && (
+                                    <p className="mt-2">Loading...</p>
+                                )}
                             </div>
+                        )}
+
+                        {errors.length > 0 && (
+                            <ul className={"text-red-700"}>
+                                {errors.map((err, i) => <li key={i}>{err}</li>)}
+                            </ul>
                         )}
                     </div>
                 </div>
