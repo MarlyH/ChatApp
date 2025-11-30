@@ -23,7 +23,7 @@ namespace ChatApp
 
             builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
             {
-                options.SignIn.RequireConfirmedAccount = true;
+                options.SignIn.RequireConfirmedEmail = true;
                 options.User.RequireUniqueEmail = true;
                 
                 // Password settings turned off for dev.
@@ -33,7 +33,9 @@ namespace ChatApp
                 options.Password.RequireUppercase = false;
                 options.Password.RequiredLength = 1;
                 options.Password.RequiredUniqueChars = 1;
-            }).AddEntityFrameworkStores<ChatDbContext>();
+            })
+                .AddEntityFrameworkStores<ChatDbContext>()
+                .AddDefaultTokenProviders();
 
             builder.Services.ConfigureApplicationCookie(options =>
             {
@@ -45,6 +47,7 @@ namespace ChatApp
             builder.Services.AddScoped<ChatRoomRepository>();
             builder.Services.AddScoped<ChatRoomService>();
             builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<EmailService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
