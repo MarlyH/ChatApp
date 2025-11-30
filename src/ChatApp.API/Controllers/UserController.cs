@@ -1,9 +1,5 @@
 ﻿using ChatApp.API.DTOs;
-using ChatApp.API.Models;
-using ChatApp.API.Repositories;
 using ChatApp.API.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.API.Controllers
@@ -28,7 +24,7 @@ namespace ChatApp.API.Controllers
                 return BadRequest(new { errors = result.Errors });
             }
 
-            return Ok("User successfully created.");
+            return Ok(new { message = "User successfully created." });
         }
 
         [HttpPost("login")]
@@ -38,7 +34,7 @@ namespace ChatApp.API.Controllers
 
             if (signInResult.Succeeded)
             {
-                return Ok("Login successful");
+                return Ok(new { message = "Login successful" });
             }
 
             return Unauthorized(new { message = "Incorrect password." });
@@ -47,15 +43,13 @@ namespace ChatApp.API.Controllers
         [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
-            try
+            var result = await _userService.ConfirmEmail(userId, token);
+            if (!result.Succeeded)
             {
-                await _userService.ConfirmEmail(userId, token);
+                return BadRequest(new { message = result.Message });
             }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            return Ok("Email successfully confirmed.");
+
+            return Ok(new { message = result.Message });
         }
     }
 }

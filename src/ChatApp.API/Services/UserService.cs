@@ -95,18 +95,36 @@ namespace ChatApp.API.Services
             return await _signInManager.PasswordSignInAsync(dto.Username, dto.Password, dto.IsPersistent, false);
         }
 
-        public async Task ConfirmEmail(string userId, string token)
+        /// <summary>
+        /// Confirms a user's email address.
+        /// </summary>
+        public async Task<ConfirmEmailResult> ConfirmEmail(string userId, string token)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                throw new Exception("User not found.");
+                return new ConfirmEmailResult
+                {
+                    Succeeded = false,
+                    Message = "User not found."
+                };
             }
+
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (!result.Succeeded)
             {
-                throw new Exception("Email confirmation failed.");
+                return new ConfirmEmailResult
+                {
+                    Succeeded = false,
+                    Message = "Email confirmation failed."
+                };
             }
+
+            return new ConfirmEmailResult
+            {
+                Succeeded = true,
+                Message = "Email successfully confirmed."
+            };
         }
     }
 }
