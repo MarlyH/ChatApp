@@ -1,3 +1,5 @@
+import RegisterModal from "./RegisterModal.tsx";
+
 export default function NavBar() {
     return (
         <div className="navbar bg-base-100 shadow-sm">
@@ -5,6 +7,7 @@ export default function NavBar() {
                 <a className="btn btn-ghost text-xl">ChatApp</a>
             </div>
             <div className="flex-none">
+                <RegisterModal />
                 <div className="dropdown dropdown-end">
                     <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                         <div className="w-10 rounded-full">
