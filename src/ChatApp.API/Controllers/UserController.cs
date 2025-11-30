@@ -3,6 +3,7 @@ using ChatApp.API.Models;
 using ChatApp.API.Repositories;
 using ChatApp.API.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.API.Controllers
@@ -33,14 +34,28 @@ namespace ChatApp.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest dto)
         {
-            var signInResult = await _userService.LoginAsync(dto); 
-            
-            if (signInResult.Succeeded) 
+            var signInResult = await _userService.LoginAsync(dto);
+
+            if (signInResult.Succeeded)
             {
                 return Ok("Login successful");
             }
 
             return Unauthorized(new { message = "Incorrect password." });
+        }
+
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            try
+            {
+                await _userService.ConfirmEmail(userId, token);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            return Ok("Email successfully confirmed.");
         }
     }
 }

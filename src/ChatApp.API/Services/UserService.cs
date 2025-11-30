@@ -54,7 +54,7 @@ namespace ChatApp.API.Services
             // Generate email confirmation token and link
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
             var apiUrl = _configuration.GetValue<string>("ApiUrl");
-            var confirmLink = $"{apiUrl}/confirm-email?userId={newUser.Id}&token={Uri.EscapeDataString(token)}";
+            var confirmLink = $"{apiUrl}/api/user/confirm-email?userId={newUser.Id}&token={Uri.EscapeDataString(token)}";
 
             try
             {
@@ -93,6 +93,20 @@ namespace ChatApp.API.Services
         public async Task<SignInResult> LoginAsync(LoginRequest dto)
         {
             return await _signInManager.PasswordSignInAsync(dto.Username, dto.Password, dto.IsPersistent, false);
+        }
+
+        public async Task ConfirmEmail(string userId, string token)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                throw new Exception("User not found.");
+            }
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (!result.Succeeded)
+            {
+                throw new Exception("Email confirmation failed.");
+            }
         }
     }
 }
