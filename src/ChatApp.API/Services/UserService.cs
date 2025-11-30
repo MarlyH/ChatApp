@@ -31,7 +31,7 @@ namespace ChatApp.API.Services
         /// Creates a new AppUser and sends a confirmation email.
         /// If email sending fails, the user creation is rolled back.
         /// </summary>
-        public async Task<CreateUserResult> CreateNewUserAsync(CreateUserRequest dto)
+        public async Task<ServiceResult<AppUser>> CreateNewUserAsync(CreateUserRequest dto)
         {
             AppUser newUser = new AppUser
             {
@@ -42,7 +42,7 @@ namespace ChatApp.API.Services
             var result = await _userManager.CreateAsync(newUser, dto.Password);
             if (!result.Succeeded)
             {
-                return new CreateUserResult
+                return new ServiceResult<AppUser>
                 {
                     Succeeded = false,
                     Errors = result.Errors
@@ -76,17 +76,17 @@ namespace ChatApp.API.Services
                 await _userManager.DeleteAsync(newUser);
                 _logger.LogError(ex, $"Failed to send confirmation email for user {newUser.Id}.");
 
-                return new CreateUserResult
+                return new ServiceResult<AppUser>
                 {
                     Succeeded = false,
                     Errors = new List<string> { "Something went wrong during registration. Please try again later." }
                 };
             }
 
-            return new CreateUserResult
+            return new ServiceResult<AppUser>
             {
                 Succeeded = true,
-                User = newUser
+                Data = newUser
             };
         }
 
@@ -98,12 +98,12 @@ namespace ChatApp.API.Services
         /// <summary>
         /// Confirms a user's email address.
         /// </summary>
-        public async Task<ConfirmEmailResult> ConfirmEmail(string userId, string token)
+        public async Task<ServiceResult> ConfirmEmail(string userId, string token)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return new ConfirmEmailResult
+                return new ServiceResult
                 {
                     Succeeded = false,
                     Message = "User not found."
@@ -113,14 +113,14 @@ namespace ChatApp.API.Services
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (!result.Succeeded)
             {
-                return new ConfirmEmailResult
+                return new ServiceResult
                 {
                     Succeeded = false,
                     Message = "Email confirmation failed."
                 };
             }
 
-            return new ConfirmEmailResult
+            return new ServiceResult
             {
                 Succeeded = true,
                 Message = "Email successfully confirmed."

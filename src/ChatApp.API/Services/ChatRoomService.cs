@@ -1,8 +1,6 @@
 ﻿using ChatApp.API.DTOs;
-using ChatApp.API.Models;
 using ChatApp.API.Repositories;
 using ChatApp.Domain.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.API.Services
 {
@@ -19,14 +17,14 @@ namespace ChatApp.API.Services
         /// Creates a new chat room with the specified name and privacy setting.
         /// </summary>
         /// <returns>The newly created <see cref="ChatRoom"/>.</returns>
-        public async Task<CreateRoomResult> CreateRoom(CreateRoomRequest dto)
+        public async Task<ServiceResult<ChatRoom>> CreateRoom(CreateRoomRequest dto)
         {
             string slug = GenerateSlug(dto.Name);
             if (await _repo.SlugExistsAsync(slug))
             {
-                return new CreateRoomResult
+                return new ServiceResult<ChatRoom>
                 {
-                    Successful = false,
+                    Succeeded = false,
                     Message = "Room name is invalid."
                 };
             }
@@ -41,11 +39,11 @@ namespace ChatApp.API.Services
 
             await _repo.AddRoomAsync(newRoom);
 
-            return new CreateRoomResult
+            return new ServiceResult<ChatRoom>
             {
-                Successful = true,
+                Succeeded = true,
                 Message = "Chatroom successfully created.",
-                Chatroom = newRoom
+                Data = newRoom
             };
         }
 

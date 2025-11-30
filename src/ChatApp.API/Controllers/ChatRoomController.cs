@@ -20,12 +20,12 @@ namespace ChatApp.API.Controllers
         {
             var result = await _chatRoomService.CreateRoom(dto);
 
-            if (!result.Successful)
+            if (!result.Succeeded)
             {
                 return BadRequest(new { message = result.Message });
             }
 
-            return Ok(new { message = result.Message, roomId = result.Chatroom?.Id });
+            return Ok(new { message = result.Message, roomId = result.Data?.Id });
         }
     }
 }

@@ -18,7 +18,7 @@ namespace ChatApp.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest dto)
         {
-            CreateUserResult result = await _userService.CreateNewUserAsync(dto);
+            var result = await _userService.CreateNewUserAsync(dto);
             if (!result.Succeeded)
             {
                 return BadRequest(new { errors = result.Errors });
