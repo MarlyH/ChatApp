@@ -42,6 +42,8 @@ namespace ChatApp
                 options.Cookie.HttpOnly = true;
                 options.Cookie.SameSite = SameSiteMode.None; // REQUIRED for localhost HTTPS + frontend
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.ExpireTimeSpan = TimeSpan.FromDays(7);
+                options.SlidingExpiration = true; // renew cookie on each request
             });
 
             builder.Services.AddScoped<ChatRoomRepository>();

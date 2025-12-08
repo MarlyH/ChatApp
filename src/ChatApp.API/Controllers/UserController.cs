@@ -38,7 +38,7 @@ namespace ChatApp.API.Controllers
                 return Ok(new { message = "Login successful" });
             }
 
-            return Unauthorized(new { message = "Incorrect password." });
+            return Unauthorized(new { message = "Incorrect credentials." });
         }
 
         [HttpGet("confirm-email")]

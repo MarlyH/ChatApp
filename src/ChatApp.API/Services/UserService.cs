@@ -72,7 +72,7 @@ namespace ChatApp.API.Services
 
         public async Task<ServiceResult> ResendConfirmation(ResendConfirmationRequest dto)
         {
-            AppUser user = await _userManager.FindByEmailAsync(dto.Email);
+            AppUser? user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
             {
                 return new ServiceResult
