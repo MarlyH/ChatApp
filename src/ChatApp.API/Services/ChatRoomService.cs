@@ -72,6 +72,34 @@ namespace ChatApp.API.Services
             };
         }
 
+        /// <summary>
+        /// Retrieves detailed information about a chat room identified by its slug.
+        /// </summary>
+        public async Task<ServiceResult<GetRoomDetailsResponse>> GetRoomDetails(string slug)
+        {
+            var room = await _repo.GetRoomBySlugAsync(slug);
+            if (room == null)
+            {
+                return new ServiceResult<GetRoomDetailsResponse>
+                {
+                    Succeeded = false,
+                    Message = "Room not found."
+                };
+            }
+
+            var response = new GetRoomDetailsResponse
+            {
+                Name = room.Name,
+            };
+
+            return new ServiceResult<GetRoomDetailsResponse>
+            {
+                Succeeded = true,
+                Message = "Room details retrieved successfully.",
+                Data = response
+            };
+        }
+
         private string GenerateSlug(string roomName)
         {
             return roomName

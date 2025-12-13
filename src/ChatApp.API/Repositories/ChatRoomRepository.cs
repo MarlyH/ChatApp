@@ -29,6 +29,10 @@ namespace ChatApp.API.Repositories
         {
             return await _db.ChatRooms.Where(r => !r.IsInviteOnly).ToListAsync();
         }
-    }
 
+        public async Task<ChatRoom?> GetRoomBySlugAsync(string slug)
+        {
+            return await _db.ChatRooms.FirstOrDefaultAsync(r => r.Slug == slug);
+        }
+    }
 }

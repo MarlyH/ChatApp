@@ -40,5 +40,18 @@ namespace ChatApp.API.Controllers
 
             return Ok(result.Data);
         }
+
+        [HttpGet("{slug}")]
+        public async Task<IActionResult> GetRoom(string slug)
+        {
+            var result = await _chatRoomService.GetRoomDetails(slug);
+
+            if (!result.Succeeded)
+            {
+                return NotFound(new { message = result.Message });
+            }
+
+            return Ok(result.Data);
+        }
     }
 }
