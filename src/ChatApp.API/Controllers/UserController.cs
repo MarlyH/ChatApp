@@ -1,6 +1,6 @@
 ﻿using ChatApp.API.DTOs;
 using ChatApp.API.Services;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.API.Controllers
@@ -35,7 +35,21 @@ namespace ChatApp.API.Controllers
 
             if (!result.Succeeded)
             {
-                return Unauthorized(new { message = "Incorrect credentials." });
+                return Unauthorized(new { message = result.Message });
+            }
+
+            return Ok(new { message = result.Message });
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetUserProfile()
+        {
+            var result = await _userService.GetUserProfileAsync(User);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(new { message = result.Message });
             }
 
             return Ok(result.Data);

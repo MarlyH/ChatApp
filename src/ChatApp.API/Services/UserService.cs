@@ -1,6 +1,7 @@
 ﻿using ChatApp.API.DTOs;
 using ChatApp.API.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace ChatApp.API.Services
 {
@@ -85,37 +86,45 @@ namespace ChatApp.API.Services
             return await SendConfirmationEmailAsync(user);
         }
 
-        public async Task<ServiceResult<LoginResponse>> LoginAsync(LoginRequest dto)
+        public async Task<ServiceResult> LoginAsync(LoginRequest dto)
         {
             SignInResult result = await _signInManager.PasswordSignInAsync(dto.Username, dto.Password, dto.IsPersistent, false);
             if (!result.Succeeded)
             {
-                return new ServiceResult<LoginResponse>
+                return new ServiceResult
                 {
                     Succeeded = false,
                     Message = "Invalid username or password."
                 };
             }
 
-            AppUser? user = await _userManager.FindByNameAsync(dto.Username);
-            if (user is null)
-            {
-                // This should never happen as the user just logged in successfully
-                // All the user will see is a failed login attempt and will have to try again.
-                return new ServiceResult<LoginResponse>
-                {
-                    Succeeded = false,
-                    Message = "User not found after successful login."
-                };
-            }
-
-            return new ServiceResult<LoginResponse>
+            return new ServiceResult
             {
                 Succeeded = true,
-                Data = new LoginResponse
+                Message = "User successfully logged in."
+            };
+        }
+
+        public async Task<ServiceResult<GetProfileResponse>> GetUserProfileAsync(ClaimsPrincipal userClaims)
+        {
+            var appUser = await _userManager.GetUserAsync(userClaims);
+
+            if (appUser is null)
+            {
+                return new ServiceResult<GetProfileResponse>
                 {
-                    Username = user.UserName!,
-                    Email = user.Email!
+                    Succeeded = false,
+                    Message = "User not found."
+                };
+            }
+            
+            return new ServiceResult<GetProfileResponse>
+            {
+                Succeeded = true,
+                Data = new GetProfileResponse
+                {
+                    Username = appUser.UserName!,
+                    Email = appUser.Email!
                 }
             };
         }
