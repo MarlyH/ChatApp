@@ -1,7 +1,8 @@
 import UsernameInput from "./UsernameInput.tsx";
 import PasswordInput from "./PasswordInput.tsx";
-import {useState} from "react";
+import React, {useContext, useState} from "react";
 import PersistenceInput from "./PersistenceInput.tsx";
+import {UserContext} from "../UserContext.tsx";
 
 interface LoginRequest {
     username: string;
@@ -15,6 +16,8 @@ export default function LoginModal() {
         password: "",
         isPersistent: false
     });
+
+    const userContext = useContext(UserContext);
 
     const [errors, setErrors] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
@@ -33,7 +36,6 @@ export default function LoginModal() {
         setLoading(true);
 
         try {
-            console.log(form);
             const loginRes = await fetch("https://localhost:7073/api/user/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -47,6 +49,15 @@ export default function LoginModal() {
                 const flattenedErrors = Object.values(data.errors).flat().map(e => String(e));
                 setErrors(flattenedErrors);
             } else {
+                // set values in user context
+                if (!userContext) return null;
+                const data = await loginRes.json();
+                userContext.setUser({
+                    username: data.username,
+                    email: data.email,
+                    isLoggedIn: true
+                });
+
                 // login success, redirect
                 alert("successfully logged in!");
             }
