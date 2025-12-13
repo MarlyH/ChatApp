@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import {Link} from "react-router";
 
 interface GetRoomsResponse {
     id: string;
@@ -48,13 +49,15 @@ export default function ChatroomList() {
                 )}
 
                 {chatrooms.map((chatroom: GetRoomsResponse) => (
-                    <li className="list-row" key={chatroom.id}>
-                        <div><img className="size-10 rounded-box" src="https://img.daisyui.com/images/profile/demo/1@94.webp"/></div>
-                        <div>
-                            <div>{chatroom.name}</div>
-                            <div className="text-xs uppercase font-semibold opacity-60">{chatroom.slug}</div>
-                        </div>
-                    </li>
+                    <Link to={`/room/${chatroom.slug}`}>
+                        <li className="list-row" key={chatroom.id}>
+                            <div><img className="size-10 rounded-box" src="https://img.daisyui.com/images/profile/demo/1@94.webp"/></div>
+                            <div>
+                                <div>{chatroom.name}</div>
+                                <div className="text-xs uppercase font-semibold opacity-60">{chatroom.slug}</div>
+                            </div>
+                        </li>
+                    </Link>
                 ))}
             </ul>
         </>
