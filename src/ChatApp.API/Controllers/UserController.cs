@@ -31,14 +31,14 @@ namespace ChatApp.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest dto)
         {
-            var signInResult = await _userService.LoginAsync(dto);
+            var result = await _userService.LoginAsync(dto);
 
-            if (signInResult.Succeeded)
+            if (!result.Succeeded)
             {
-                return Ok(new { message = "Login successful" });
+                return Unauthorized(new { message = "Incorrect credentials." });
             }
 
-            return Unauthorized(new { message = "Incorrect credentials." });
+            return Ok(result.Data);
         }
 
         [HttpGet("confirm-email")]

@@ -85,9 +85,39 @@ namespace ChatApp.API.Services
             return await SendConfirmationEmailAsync(user);
         }
 
-        public async Task<SignInResult> LoginAsync(LoginRequest dto)
+        public async Task<ServiceResult<LoginResponse>> LoginAsync(LoginRequest dto)
         {
-            return await _signInManager.PasswordSignInAsync(dto.Username, dto.Password, dto.IsPersistent, false);
+            SignInResult result = await _signInManager.PasswordSignInAsync(dto.Username, dto.Password, dto.IsPersistent, false);
+            if (!result.Succeeded)
+            {
+                return new ServiceResult<LoginResponse>
+                {
+                    Succeeded = false,
+                    Message = "Invalid username or password."
+                };
+            }
+
+            AppUser? user = await _userManager.FindByNameAsync(dto.Username);
+            if (user is null)
+            {
+                // This should never happen as the user just logged in successfully
+                // All the user will see is a failed login attempt and will have to try again.
+                return new ServiceResult<LoginResponse>
+                {
+                    Succeeded = false,
+                    Message = "User not found after successful login."
+                };
+            }
+
+            return new ServiceResult<LoginResponse>
+            {
+                Succeeded = true,
+                Data = new LoginResponse
+                {
+                    Username = user.UserName!,
+                    Email = user.Email!
+                }
+            };
         }
 
         /// <summary>
