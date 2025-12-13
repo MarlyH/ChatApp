@@ -47,6 +47,31 @@ namespace ChatApp.API.Services
             };
         }
 
+        /// <summary>
+        /// Retrieves a list of all public chat rooms available to users.
+        /// </summary>
+        /// <returns>A <see cref="ServiceResult{T}"/> containing a list of <see cref="GetRoomsResponse"/> 
+        /// objects representing the public chat rooms. The list will be empty if no public rooms are available.
+        /// </returns>
+        public async Task<ServiceResult<List<GetRoomsResponse>>> GetPublicRooms()
+        {
+            var publicRooms = await _repo.GetPublicRoomsAsync();
+
+            List<GetRoomsResponse> response = publicRooms.Select(room => new GetRoomsResponse
+            {
+                Id = room.Id,
+                Name = room.Name,
+                Slug = room.Slug
+            }).ToList();
+
+            return new ServiceResult<List<GetRoomsResponse>>
+            {
+                Succeeded = true,
+                Message = "Chatrooms retrieved successfully.",
+                Data = response
+            };
+        }
+
         private string GenerateSlug(string roomName)
         {
             return roomName

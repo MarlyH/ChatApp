@@ -24,6 +24,11 @@ namespace ChatApp.API.Repositories
             await _db.ChatRooms.AddAsync(room);
             await _db.SaveChangesAsync();
         }
+
+        public async Task<List<ChatRoom>> GetPublicRoomsAsync()
+        {
+            return await _db.ChatRooms.Where(r => !r.IsInviteOnly).ToListAsync();
+        }
     }
 
 }
