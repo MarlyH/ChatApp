@@ -49,16 +49,29 @@ export default function LoginModal() {
                 const flattenedErrors = Object.values(data.errors).flat().map(e => String(e));
                 setErrors(flattenedErrors);
             } else {
-                // set values in user context
-                if (!userContext) return null;
-                const data = await loginRes.json();
-                userContext.setUser({
-                    username: data.username,
-                    email: data.email,
-                    isLoggedIn: true
-                });
+                // login successful, fetch user profile.
+                try {
+                    const getProfileRes = await fetch("https://localhost:7073/api/user/me", {
+                        credentials: "include"
+                    });
 
-                // login success, redirect
+                    if (!getProfileRes.ok) {
+                        // should never happen
+                        setErrors(["Something went wrong"]);
+                    }
+
+                    if (!userContext) return null;
+                    const data = await getProfileRes.json();
+                    userContext.setUser({
+                        username: data.username,
+                        email: data.email,
+                        isLoggedIn: true
+                    });
+                } catch {
+                    setErrors(["Something went wrong"]);
+                }
+
+                // login success & profile fetch success, redirect
                 alert("successfully logged in!");
             }
         } catch {
