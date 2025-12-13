@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import ChatroomList from "../Components/ChatroomList.tsx";
 
 interface CreateRoomRequest {
     name: string;
@@ -47,6 +48,8 @@ export default function Landing() {
 
     return (
         <div>
+            <ChatroomList />
+
             <h1>Landing</h1>
 
             {!showForm ? (
