@@ -50,6 +50,8 @@ namespace ChatApp
             builder.Services.AddScoped<ChatRoomService>();
             builder.Services.AddScoped<RoomMemberService>();
             builder.Services.AddScoped<RoomMemberRepository>();
+            builder.Services.AddScoped<ChatMessageService>();
+            builder.Services.AddScoped<ChatMessageRepository>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<EmailService>();
 

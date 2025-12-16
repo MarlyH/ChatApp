@@ -19,5 +19,4 @@ namespace ChatApp.Domain.Models
 
         public JsonDocument Metadata { get; set; } = JsonDocument.Parse("{}");
     }
-
 }
