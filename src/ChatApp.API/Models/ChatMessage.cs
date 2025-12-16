@@ -10,9 +10,9 @@ namespace ChatApp.Domain.Models
         [ForeignKey("RoomId")]
         public ChatRoom Room { get; set; } = null!;
 
-        public Guid? SenderId { get; set; }  // nullable for guests
+        public Guid SenderId { get; set; }
         [ForeignKey("SenderId")]
-        public string? SenderName { get; set; } // optional for guests
+        public RoomMember? Sender { get; set; }
 
         public string Content { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
