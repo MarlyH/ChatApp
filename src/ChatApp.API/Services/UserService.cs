@@ -167,7 +167,7 @@ namespace ChatApp.API.Services
         }
 
         /// <summary>
-        /// Confirms a user's email address.
+        /// Confirms a user's email address and verifies their account.
         /// </summary>
         public async Task<ServiceResult> ConfirmEmail(string userId, string token)
         {

@@ -21,7 +21,7 @@ namespace ChatApp
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConn"));
             });
 
-            builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+            builder.Services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
             {
                 options.SignIn.RequireConfirmedEmail = true;
                 options.User.RequireUniqueEmail = true;
@@ -48,6 +48,8 @@ namespace ChatApp
 
             builder.Services.AddScoped<ChatRoomRepository>();
             builder.Services.AddScoped<ChatRoomService>();
+            builder.Services.AddScoped<RoomMemberService>();
+            builder.Services.AddScoped<RoomMemberRepository>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<EmailService>();
 

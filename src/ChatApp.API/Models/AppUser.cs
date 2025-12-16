@@ -2,7 +2,7 @@
 
 namespace ChatApp.API.Models
 {
-    public class AppUser : IdentityUser
+    public class AppUser : IdentityUser<Guid>
     {
     }
 }
