@@ -24,16 +24,16 @@ namespace ChatApp.API.Repositories
             return await _db.RoomMembers.AnyAsync(rm => rm.UserId == userId && rm.RoomId == roomId);
         }
 
-        public async Task<RoomMember?> GetByUserIdAsync(Guid roomId, Guid userId)
+        public async Task<RoomMember?> GetRegisteredRoomMemberAsync(Guid roomId, Guid userId)
         {
             return await _db.RoomMembers
                 .FirstOrDefaultAsync(rm => rm.RoomId == roomId && rm.UserId == userId);
         }
 
-        /*public async Task<RoomMember?> GetByGuestTokenAsync(Guid roomId, string guestToken)
+        public async Task<RoomMember?> GetGuestRoomMemberAsync(Guid roomId, string guestToken)
         {
             return await _db.RoomMembers
                 .FirstOrDefaultAsync(rm => rm.RoomId == roomId && rm.GuestToken == guestToken);
-        }*/
+        }
     }
 }

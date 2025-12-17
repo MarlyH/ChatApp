@@ -1,5 +1,5 @@
-﻿using ChatApp.Infrastructure.Data;
-using Microsoft.AspNetCore.Http;
+﻿using ChatApp.Domain.Models;
+using ChatApp.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.API.Repositories
@@ -12,6 +12,12 @@ namespace ChatApp.API.Repositories
         public ChatMessageRepository(ChatDbContext db)
         {
             _db = db;
+        }
+
+        public async Task CreateMessageAsync(ChatMessage message)
+        {
+            await _db.ChatMessages.AddAsync(message);
+            await _db.SaveChangesAsync();
         }
     }
 }

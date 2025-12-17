@@ -6,11 +6,11 @@ namespace ChatApp.API.Services
 {
     public class ChatRoomService
     {
-        private readonly ChatRoomRepository _repo;
+        private readonly ChatRoomRepository _chatRoomRepository;
 
-        public ChatRoomService(ChatRoomRepository repo)
+        public ChatRoomService(ChatRoomRepository chatRoomRepository)
         {
-            _repo = repo;
+            _chatRoomRepository = chatRoomRepository;
         }
 
         /// <summary>
@@ -20,7 +20,7 @@ namespace ChatApp.API.Services
         public async Task<ServiceResult<ChatRoom>> CreateRoom(CreateRoomRequest dto)
         {
             string slug = GenerateSlug(dto.Name);
-            if (await _repo.SlugExistsAsync(slug))
+            if (await _chatRoomRepository.SlugExistsAsync(slug))
             {
                 return new ServiceResult<ChatRoom>
                 {
@@ -37,7 +37,7 @@ namespace ChatApp.API.Services
                 IsInviteOnly = dto.IsPrivate
             };
 
-            await _repo.AddRoomAsync(newRoom);
+            await _chatRoomRepository.AddRoomAsync(newRoom);
 
             return new ServiceResult<ChatRoom>
             {
@@ -55,7 +55,7 @@ namespace ChatApp.API.Services
         /// </returns>
         public async Task<ServiceResult<List<GetRoomsResponse>>> GetPublicRooms()
         {
-            var publicRooms = await _repo.GetPublicRoomsAsync();
+            var publicRooms = await _chatRoomRepository.GetPublicRoomsAsync();
 
             List<GetRoomsResponse> response = publicRooms.Select(room => new GetRoomsResponse
             {
@@ -77,7 +77,7 @@ namespace ChatApp.API.Services
         /// </summary>
         public async Task<ServiceResult<GetRoomDetailsResponse>> GetRoomDetails(string slug)
         {
-            var room = await _repo.GetRoomBySlugAsync(slug);
+            var room = await _chatRoomRepository.GetRoomBySlugAsync(slug);
             if (room == null)
             {
                 return new ServiceResult<GetRoomDetailsResponse>
