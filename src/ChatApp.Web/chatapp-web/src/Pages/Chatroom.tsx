@@ -52,6 +52,11 @@ export default function Chatroom() {
             .then(() => hubConn.invoke("JoinRoom", roomSlug))
             .then(() => console.log(roomSlug + " joined"))
             .catch(err => console.error("Hub start/join failed:", err));
+
+        return () => {
+            hubConn.invoke("LeaveRoom", roomSlug)
+                .finally(() => hubConn.stop());
+        };
     }, [roomSlug]);
 
     return (

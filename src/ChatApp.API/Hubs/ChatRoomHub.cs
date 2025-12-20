@@ -8,5 +8,10 @@ namespace ChatApp.API.Hubs
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, roomSlug);
         }
+
+        public async Task LeaveRoom(string roomSlug)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomSlug);
+        }
     }
 }
