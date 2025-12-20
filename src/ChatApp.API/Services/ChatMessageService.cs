@@ -63,7 +63,7 @@ namespace ChatApp.API.Services
             await _chatMsgRepository.CreateMessageAsync(msg);
 
             // broadcast to the room's SignalR hub group
-            await _hubContext.Clients.Group(room.Id.ToString()).SendAsync("MessageReceived");
+            await _hubContext.Clients.Group(roomSlug).SendAsync("MessageReceived", msgContent);
 
             return new ServiceResult
             {

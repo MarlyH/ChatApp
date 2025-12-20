@@ -4,9 +4,9 @@ namespace ChatApp.API.Hubs
 {
     public class ChatRoomHub : Hub
     {
-        public async Task JoinRoom(Guid roomId)
+        public async Task JoinRoom(string roomSlug)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomSlug);
         }
     }
 }

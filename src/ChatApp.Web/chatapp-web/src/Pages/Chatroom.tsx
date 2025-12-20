@@ -1,5 +1,6 @@
 import {useParams} from "react-router";
 import {useCallback, useEffect, useState} from "react";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 
 interface GetRoomDetailsResponse {
     name: string;
@@ -36,7 +37,23 @@ export default function Chatroom() {
     useEffect(() => {
         void fetchRoomDetails();
         }, [fetchRoomDetails]);
-    
+
+    useEffect(() => {
+        const hubConn = new HubConnectionBuilder()
+            .withUrl("https://localhost:7073/chathub")
+            .withAutomaticReconnect() // does not reconnect to the group
+            .build();
+
+        hubConn.on("MessageReceived", message => {
+            console.log(message);
+        });
+
+        hubConn.start()
+            .then(() => hubConn.invoke("JoinRoom", roomSlug))
+            .then(() => console.log(roomSlug + " joined"))
+            .catch(err => console.error("Hub start/join failed:", err));
+    }, [roomSlug]);
+
     return (
 
         <>
