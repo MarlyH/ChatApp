@@ -1,6 +1,7 @@
 import {useParams} from "react-router";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useContext, useEffect, useState} from "react";
 import { HubConnectionBuilder } from "@microsoft/signalr";
+import {UserContext} from "../UserContext.tsx";
 
 interface GetRoomDetailsResponse {
     name: string;
@@ -14,6 +15,7 @@ export default function Chatroom() {
         {
             name: ""
         });
+    const userContext = useContext(UserContext);
 
     const fetchRoomDetails = useCallback(async () => {
         setIsLoading(true);
@@ -48,8 +50,14 @@ export default function Chatroom() {
             console.log(message);
         });
 
+        hubConn.on("UserJoined", message => {
+            console.log(message);
+        });
+
+        const username = userContext?.user.username;
+
         hubConn.start()
-            .then(() => hubConn.invoke("JoinRoom", roomSlug))
+            .then(() => hubConn.invoke("JoinRoom", roomSlug, username ?? null, null))
             .then(() => console.log(roomSlug + " joined"))
             .catch(err => console.error("Hub start/join failed:", err));
 
