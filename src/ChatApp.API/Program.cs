@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ChatApp.API.Models;
 using ChatApp.API.Services;
 using Scalar.AspNetCore;
+using ChatApp.API.Hubs;
 
 namespace ChatApp
 {
@@ -58,6 +59,8 @@ namespace ChatApp
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            builder.Services.AddSignalR();
             
             builder.Services.AddProblemDetails();
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -84,6 +87,8 @@ namespace ChatApp
                     options.WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Fetch);
                 });
             }
+
+            app.MapHub<ChatRoomHub>("/chathub");
 
             app.UseExceptionHandler();
 

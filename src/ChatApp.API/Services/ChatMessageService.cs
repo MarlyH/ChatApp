@@ -1,6 +1,8 @@
 ﻿using ChatApp.API.DTOs;
+using ChatApp.API.Hubs;
 using ChatApp.API.Repositories;
 using ChatApp.Domain.Models;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ChatApp.API.Services
 {
@@ -9,15 +11,18 @@ namespace ChatApp.API.Services
         private readonly ChatMessageRepository _chatMsgRepository;
         private readonly ChatRoomRepository _chatRoomRepository;
         private readonly RoomMemberService _roomMemberService;
+        private readonly IHubContext<ChatRoomHub> _hubContext;
 
         public ChatMessageService(
             ChatMessageRepository chatMsgRepository, 
             ChatRoomRepository chatRoomRepository, 
-            RoomMemberService roomMemberService)
+            RoomMemberService roomMemberService,
+            IHubContext<ChatRoomHub> hubContext)
         {
             _chatMsgRepository = chatMsgRepository;
             _chatRoomRepository = chatRoomRepository;
             _roomMemberService = roomMemberService;
+            _hubContext = hubContext;
         }
 
         public async Task<ServiceResult> SendMessageAsync(
@@ -56,6 +61,9 @@ namespace ChatApp.API.Services
                 Content = msgContent,
             };
             await _chatMsgRepository.CreateMessageAsync(msg);
+
+            // broadcast to the room's SignalR hub group
+            await _hubContext.Clients.Group(room.Id.ToString()).SendAsync("MessageReceived");
 
             return new ServiceResult
             {
