@@ -16,6 +16,7 @@ export default function Chatroom() {
             name: ""
         });
     const userContext = useContext(UserContext);
+    const username = userContext?.user.username;
 
     const fetchRoomDetails = useCallback(async () => {
         setIsLoading(true);
@@ -43,7 +44,7 @@ export default function Chatroom() {
     useEffect(() => {
         const hubConn = new HubConnectionBuilder()
             .withUrl("https://localhost:7073/chathub")
-            .withAutomaticReconnect() // does not reconnect to the group
+            .withAutomaticReconnect()
             .build();
 
         hubConn.on("MessageReceived", message => {
@@ -54,18 +55,24 @@ export default function Chatroom() {
             console.log(message);
         });
 
-        const username = userContext?.user.username;
-
+        // join the hub group associated with this chatroom.
         hubConn.start()
             .then(() => hubConn.invoke("JoinRoom", roomSlug, username ?? null, null))
             .then(() => console.log(roomSlug + " joined"))
             .catch(err => console.error("Hub start/join failed:", err));
 
+        // rejoin the same room.
+        hubConn.onreconnected(() => {
+            hubConn.invoke("JoinRoom", roomSlug, username ?? null, null)
+                .then(() => console.log(roomSlug + " rejoined"))
+                .catch(err => console.error("Hub rejoin failed:", err));
+        });
+
         return () => {
             hubConn.invoke("LeaveRoom", roomSlug)
                 .finally(() => hubConn.stop());
         };
-    }, [roomSlug]);
+    }, [roomSlug, username]);
 
     return (
 
