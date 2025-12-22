@@ -3,12 +3,13 @@ import {useCallback, useContext, useEffect, useState} from "react";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import {UserContext} from "../UserContext.tsx";
 import SendMessageInput from "../Components/SendMessageInput.tsx";
+import Message from "../Components/Message.tsx";
 
 interface GetRoomDetailsResponse {
     name: string;
 }
 
-interface GetChatMessagesResponse {
+export interface GetChatMessagesResponse {
     content: string;
     createdAt: string;
     senderUsername: string;
@@ -24,7 +25,7 @@ export default function Chatroom() {
             name: ""
         });
     const userContext = useContext(UserContext);
-    const username = userContext?.user.username;
+    const username = userContext?.user.username as string;
     const [messages, setMessages] = useState<GetChatMessagesResponse[]>([]);
 
     const fetchRoomDetails = useCallback(async () => {
@@ -118,33 +119,14 @@ export default function Chatroom() {
             )}
 
             {!isLoading && (
-                <>
+                <div className="max-w-full">
                     <h1>{roomDetails.name}</h1>
 
                     {messages.map((message, index) => (
-                        <div key={index}
-                            className={`chat ${message.senderUsername === username ? "chat-end" : "chat-start"}`}
-                        >
-                            <div className="chat-image avatar">
-                                <div className="w-10 rounded-full">
-                                    <img
-                                        alt="Tailwind CSS chat bubble component"
-                                        src={`${message.senderUsername !== username 
-                                            ? "https://img.daisyui.com/images/profile/demo/kenobee@192.webp"
-                                            : "https://img.daisyui.com/images/profile/demo/anakeen@192.webp"}`}
-                                    />
-                                </div>
-                            </div>
-                            <div className="chat-header">
-                                {message.senderUsername}
-                                <time className="text-xs opacity-50">{message.createdAt}</time>
-                            </div>
-                            <div className="chat-bubble">{message.content}</div>
-                            <div className="chat-footer opacity-50">Delivered</div>
-                        </div>
+                        <Message index={index} username={username} message={message} />
                     ))}
                     <SendMessageInput roomSlug={roomSlug as string} />
-                </>
+                </div>
             )}
         </>
     )

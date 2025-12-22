@@ -10,7 +10,7 @@ function App() {
       <>
           <UserProvider>
               <NavBar />
-              <div className="flex flex-col items-center justify-center h-screen">
+              <div className="flex flex-col">
                   <Routes>
                       <Route path="/" Component={Landing}  />
                       <Route path="/room/:roomSlug" Component={Chatroom} />
