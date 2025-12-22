@@ -1,6 +1,8 @@
 ﻿using ChatApp.API.DTOs;
+using ChatApp.API.Models;
 using ChatApp.API.Repositories;
 using ChatApp.Domain.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace ChatApp.API.Services
 {
@@ -8,17 +10,21 @@ namespace ChatApp.API.Services
     {
         private readonly RoomMemberRepository _roomMemberRepository;
         private readonly ChatRoomRepository _chatRoomRepository;
-
-        public RoomMemberService(RoomMemberRepository roomMemberRepository, ChatRoomRepository chatRoomRepository)
+        private readonly UserManager<AppUser> _userManager;
+        public RoomMemberService(
+            RoomMemberRepository roomMemberRepository, 
+            ChatRoomRepository chatRoomRepository, 
+            UserManager<AppUser> userManager)
         {
             _roomMemberRepository = roomMemberRepository;
             _chatRoomRepository = chatRoomRepository;
+            _userManager = userManager;
         }
 
         /// <summary>
         /// Joins a registered user to a chat room.
         /// </summary>
-        public async Task<ServiceResult> JoinRoomRegisteredAsync(Guid userId, string slug)
+        public async Task<ServiceResult> JoinRoomRegisteredAsync(AppUser user, string slug)
         {
             // ensure room exists
             ChatRoom? room = await _chatRoomRepository.GetRoomBySlugAsync(slug);
@@ -32,7 +38,7 @@ namespace ChatApp.API.Services
             }
 
             // ensure user has not already joined
-            if (await _roomMemberRepository.IsUserRoomMemberAsync(userId, room.Id))
+            if (await _roomMemberRepository.IsUserRoomMemberAsync(user.Id, room.Id))
             {
                 return new ServiceResult
                 {
@@ -44,10 +50,10 @@ namespace ChatApp.API.Services
             // create
             RoomMember newMember = new()
             {
-                UserId = userId,
+                UserId = user.Id,
                 RoomId = room.Id,
                 JoinedAt = DateTime.UtcNow,
-                SenderName = "placeholder"
+                SenderName =  user.UserName!
             };
             await _roomMemberRepository.AddRegisteredRoomMemberAsync(newMember);
 
