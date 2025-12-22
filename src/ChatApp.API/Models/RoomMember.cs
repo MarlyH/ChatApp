@@ -9,6 +9,7 @@ namespace ChatApp.Domain.Models
         public Guid RoomId { get; set; }
         [ForeignKey("RoomId")]
         public ChatRoom Room { get; set; } = null!;
+        public required string SenderName { get; set; }
 
         // registered user
         public Guid? UserId { get; set; }
@@ -17,7 +18,6 @@ namespace ChatApp.Domain.Models
 
         // guest user
         public string? GuestToken { get; set; }
-        public string? GuestName { get; set; }
 
         public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
     }

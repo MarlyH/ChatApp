@@ -46,7 +46,8 @@ namespace ChatApp.API.Services
             {
                 UserId = userId,
                 RoomId = room.Id,
-                JoinedAt = DateTime.UtcNow
+                JoinedAt = DateTime.UtcNow,
+                SenderName = "placeholder"
             };
             await _roomMemberRepository.AddRegisteredRoomMemberAsync(newMember);
 
