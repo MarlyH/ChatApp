@@ -25,7 +25,7 @@ export default function Chatroom() {
         });
     const userContext = useContext(UserContext);
     const username = userContext?.user.username;
-    const [pastMessages, setPastMessages] = useState<GetChatMessagesResponse[]>([]);
+    const [messages, setMessages] = useState<GetChatMessagesResponse[]>([]);
 
     const fetchRoomDetails = useCallback(async () => {
         setIsLoading(true);
@@ -54,7 +54,7 @@ export default function Chatroom() {
             }
 
             const messages = await pastMessagesRes.json();
-            setPastMessages(messages);
+            setMessages(messages);
         } catch {
             setError("Unable to load past messages.");
         } finally {
@@ -78,8 +78,9 @@ export default function Chatroom() {
             .withAutomaticReconnect()
             .build();
 
-        hubConn.on("MessageReceived", message => {
-            console.log(message);
+        // append the new message to the message list
+        hubConn.on("MessageReceived", (message: GetChatMessagesResponse) => {
+            setMessages(prev => [...prev, message]);
         });
 
         hubConn.on("UserJoined", message => {
@@ -120,7 +121,7 @@ export default function Chatroom() {
                 <>
                     <h1>{roomDetails.name}</h1>
 
-                    {pastMessages.map((message, index) => (
+                    {messages.map((message, index) => (
                         <div key={index}
                             className={`chat ${message.senderUsername === username ? "chat-end" : "chat-start"}`}
                         >
@@ -128,8 +129,8 @@ export default function Chatroom() {
                                 <div className="w-10 rounded-full">
                                     <img
                                         alt="Tailwind CSS chat bubble component"
-                                        src={`${message.senderUsername !== username ? 
-                                            "https://img.daisyui.com/images/profile/demo/kenobee@192.webp"
+                                        src={`${message.senderUsername !== username 
+                                            ? "https://img.daisyui.com/images/profile/demo/kenobee@192.webp"
                                             : "https://img.daisyui.com/images/profile/demo/anakeen@192.webp"}`}
                                     />
                                 </div>
