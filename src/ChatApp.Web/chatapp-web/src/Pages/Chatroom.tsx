@@ -1,19 +1,16 @@
 import {useParams} from "react-router";
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import {useCallback, useContext, useEffect, useState} from "react";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import {UserContext} from "../UserContext.tsx";
+import SendMessageInput from "../Components/SendMessageInput.tsx";
 
 interface GetRoomDetailsResponse {
     name: string;
 }
 
-interface CreateChatMessageRequest {
-    content: string;
-    guestToken: string | null;
-}
-
 export default function Chatroom() {
     const {roomSlug} = useParams<{ roomSlug: string }>();
+
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string>("");
     const [roomDetails, setRoomDetails] = useState<GetRoomDetailsResponse>(
@@ -22,10 +19,6 @@ export default function Chatroom() {
         });
     const userContext = useContext(UserContext);
     const username = userContext?.user.username;
-    const [messageDto, setMessageDto] = useState<CreateChatMessageRequest>({
-        content: "",
-        guestToken: null
-    });
 
     const fetchRoomDetails = useCallback(async () => {
         setIsLoading(true);
@@ -83,18 +76,7 @@ export default function Chatroom() {
         };
     }, [roomSlug, username]);
 
-    const sendChatMessage = async (e: React.FormEvent) => {
-        e.preventDefault();
 
-        await fetch(`https://localhost:7073/api/rooms/${roomSlug}/messages`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify(messageDto)
-        });
-    }
 
     return (
 
@@ -110,25 +92,7 @@ export default function Chatroom() {
             {!isLoading && (
                 <>
                     <h1>{roomDetails.name}</h1>
-
-                    <form onSubmit={sendChatMessage}>
-                        <input
-                            type="text"
-                            placeholder="Type here"
-                            className="input"
-                            value={messageDto?.content}
-                            name={"content"}
-                            onChange={(e) =>
-                                setMessageDto(prev => ({
-                                    ...prev,
-                                    content: e.target.value,
-                                    guestToken: null
-                                }))
-                            }
-                        />
-                        <button type="submit" hidden={true}></button>
-                    </form>
-
+                    <SendMessageInput roomSlug={roomSlug as string} />
                 </>
             )}
         </>
