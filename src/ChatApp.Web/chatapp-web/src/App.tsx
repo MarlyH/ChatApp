@@ -9,8 +9,8 @@ function App() {
   return (
       <>
           <UserProvider>
-              <NavBar />
-              <div className="flex flex-col">
+              <div className="flex flex-col h-screen">
+                  <NavBar />
                   <Routes>
                       <Route path="/" Component={Landing}  />
                       <Route path="/room/:roomSlug" Component={Chatroom} />

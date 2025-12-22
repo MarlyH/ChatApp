@@ -35,7 +35,7 @@ export default function SendMessageInput({roomSlug} : {roomSlug: string}) {
             <input
                 type="text"
                 placeholder="Type here"
-                className="input"
+                className="input w-full"
                 value={messageDto?.content}
                 name={"content"}
                 onChange={(e) =>

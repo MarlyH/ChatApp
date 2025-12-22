@@ -108,7 +108,6 @@ export default function Chatroom() {
     }, [roomSlug, username]);
 
     return (
-
         <>
             {isLoading && (
                 <p>Loading room...</p>
@@ -119,13 +118,19 @@ export default function Chatroom() {
             )}
 
             {!isLoading && (
-                <div className="max-w-full">
-                    <h1>{roomDetails.name}</h1>
+                <div className="max-w-full flex flex-col items-center">
 
-                    {messages.map((message, index) => (
-                        <Message index={index} username={username} message={message} />
-                    ))}
-                    <SendMessageInput roomSlug={roomSlug as string} />
+                    <h1 className="text-4xl font-bold tracking-tight text-base-content/95 m-4">{roomDetails.name}</h1>
+
+                    <div className={"w-full"}>
+                        {messages.map((message, index) => (
+                            <Message index={index} username={username} message={message} />
+                        ))}
+                    </div>
+
+                    <div className={"w-full"}>
+                        <SendMessageInput roomSlug={roomSlug as string} />
+                    </div>
                 </div>
             )}
         </>
