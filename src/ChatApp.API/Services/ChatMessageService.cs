@@ -71,5 +71,35 @@ namespace ChatApp.API.Services
                 Message = $"Message successfully sent to room {room.Name}."
             };
         }
+
+        public async Task<ServiceResult<List<GetChatMessageResponse>>> GetAllRoomMessagesAsync(string roomSlug)
+        {
+            ChatRoom? room = await _chatRoomRepository.GetRoomWithMessagesBySlugAsync(roomSlug);
+            if (room is null)
+            {
+                return new ServiceResult<List<GetChatMessageResponse>>
+                {
+                    Message = "Room must be provided.",
+                    Succeeded = false
+                };
+            }
+
+            List<GetChatMessageResponse> messages = room.Messages
+                .Select(m => 
+                    new GetChatMessageResponse
+                    {
+                        Content = m.Content,
+                        CreatedAt = m.CreatedAt,
+                        SenderUsername = m.Sender!.SenderName
+                    })
+                .OrderBy(m => m.CreatedAt)
+                .ToList();
+
+            return new ServiceResult<List<GetChatMessageResponse>>
+            {
+                Succeeded = true,
+                Data = messages
+            };
+        }
     }
 }

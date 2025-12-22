@@ -8,6 +8,12 @@ interface GetRoomDetailsResponse {
     name: string;
 }
 
+interface GetChatMessagesResponse {
+    content: string;
+    createdAt: string;
+    senderUsername: string;
+}
+
 export default function Chatroom() {
     const {roomSlug} = useParams<{ roomSlug: string }>();
 
@@ -19,6 +25,7 @@ export default function Chatroom() {
         });
     const userContext = useContext(UserContext);
     const username = userContext?.user.username;
+    const [pastMessages, setPastMessages] = useState<GetChatMessagesResponse[]>([]);
 
     const fetchRoomDetails = useCallback(async () => {
         setIsLoading(true);
@@ -30,7 +37,7 @@ export default function Chatroom() {
                 setError("Room Not Found");
             } else {
                 const data = await res.json();
-                setRoomDetails(data)
+                setRoomDetails(data);
             }
         } catch {
             setError("Unable to load room.");
@@ -39,9 +46,31 @@ export default function Chatroom() {
         }
     }, [roomSlug]);
 
+    const fetchPastMessages = useCallback(async () => {
+        try {
+            const pastMessagesRes = await fetch(`https://localhost:7073/api/rooms/${roomSlug}/messages`);
+            if (!pastMessagesRes.ok) {
+                setError("Room Not Found");
+            }
+
+            const messages = await pastMessagesRes.json();
+            setPastMessages(messages);
+        } catch {
+            setError("Unable to load past messages.");
+        } finally {
+            setIsLoading(false);
+        }
+    }, [roomSlug]);
+
     useEffect(() => {
-        void fetchRoomDetails();
-        }, [fetchRoomDetails]);
+        const load = async () => {
+            await fetchRoomDetails();
+            await fetchPastMessages();
+        };
+
+        void load();
+    }, [fetchRoomDetails, fetchPastMessages]);
+
 
     useEffect(() => {
         const hubConn = new HubConnectionBuilder()
@@ -90,6 +119,29 @@ export default function Chatroom() {
             {!isLoading && (
                 <>
                     <h1>{roomDetails.name}</h1>
+
+                    {pastMessages.map((message, index) => (
+                        <div key={index}
+                            className={`chat ${message.senderUsername === username ? "chat-end" : "chat-start"}`}
+                        >
+                            <div className="chat-image avatar">
+                                <div className="w-10 rounded-full">
+                                    <img
+                                        alt="Tailwind CSS chat bubble component"
+                                        src={`${message.senderUsername !== username ? 
+                                            "https://img.daisyui.com/images/profile/demo/kenobee@192.webp"
+                                            : "https://img.daisyui.com/images/profile/demo/anakeen@192.webp"}`}
+                                    />
+                                </div>
+                            </div>
+                            <div className="chat-header">
+                                {message.senderUsername}
+                                <time className="text-xs opacity-50">{message.createdAt}</time>
+                            </div>
+                            <div className="chat-bubble">{message.content}</div>
+                            <div className="chat-footer opacity-50">Delivered</div>
+                        </div>
+                    ))}
                     <SendMessageInput roomSlug={roomSlug as string} />
                 </>
             )}

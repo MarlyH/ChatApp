@@ -10,17 +10,10 @@ namespace ChatApp.API.Controllers
     public class ChatMessageController : ControllerBase
     {
         private readonly ChatMessageService _chatMsgService;
-        private readonly RoomMemberService _roomMemberService;
-        private readonly ChatRoomService _chatRoomService;
 
-        public ChatMessageController(
-            ChatMessageService chatMsgService, 
-            RoomMemberService roomMemberService, 
-            ChatRoomService chatRoomService)
+        public ChatMessageController(ChatMessageService chatMsgService)
         {
             _chatMsgService = chatMsgService;
-            _roomMemberService = roomMemberService;
-            _chatRoomService = chatRoomService;
         }
 
         [HttpPost]
@@ -40,6 +33,18 @@ namespace ChatApp.API.Controllers
             }
 
             return Ok(new { message = result.Message });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllRoomMessages(string roomSlug)
+        {
+            var result = await _chatMsgService.GetAllRoomMessagesAsync(roomSlug);
+            if (!result.Succeeded)
+            {
+                return NotFound(new { message = result.Message });
+            }
+
+            return Ok(result.Data);
         }
     }
 }
