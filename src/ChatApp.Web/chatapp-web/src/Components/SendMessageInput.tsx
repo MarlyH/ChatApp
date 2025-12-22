@@ -22,6 +22,12 @@ export default function SendMessageInput({roomSlug} : {roomSlug: string}) {
             credentials: 'include',
             body: JSON.stringify(messageDto)
         });
+
+        // clear message input after sending
+        setMessageDto(prev => ({
+            ...prev,
+            content: ""
+        }))
     }
 
     return (
@@ -35,8 +41,7 @@ export default function SendMessageInput({roomSlug} : {roomSlug: string}) {
                 onChange={(e) =>
                     setMessageDto(prev => ({
                         ...prev,
-                        content: e.target.value,
-                        guestToken: null
+                        content: e.target.value
                     }))
                 }
             />

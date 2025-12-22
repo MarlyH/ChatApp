@@ -76,8 +76,6 @@ export default function Chatroom() {
         };
     }, [roomSlug, username]);
 
-
-
     return (
 
         <>
