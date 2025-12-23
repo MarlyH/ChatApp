@@ -37,12 +37,12 @@ namespace ChatApp.API.Services
                 };
             }
 
-            // ensure user has not already joined
+            // early return if user already joined.
             if (await _roomMemberRepository.IsUserRoomMemberAsync(user.Id, room.Id))
             {
                 return new ServiceResult
                 {
-                    Succeeded = false,
+                    Succeeded = true,
                     Message = "User is already a member of this chat room."
                 };
             }
@@ -64,7 +64,7 @@ namespace ChatApp.API.Services
             };
         }
 
-        public async Task<ServiceResult<string>> JoinRoomGuestAsync(string guestName, string roomSlug)
+        public async Task<ServiceResult<string>> JoinRoomGuestAsync(JoinRoomGuestRequest dto, string roomSlug)
         {
             // ensure room exists
             ChatRoom? room = await _chatRoomRepository.GetRoomBySlugAsync(roomSlug);
@@ -77,13 +77,33 @@ namespace ChatApp.API.Services
                 };
             }
 
+            // early return for returning guest -- no need to recreate.
+            if (dto.GuestToken is not null && await _roomMemberRepository.IsGuestRoomMemberAsync(dto.GuestToken, room.Id))
+            {
+                return new ServiceResult<string>
+                {
+                    Succeeded = true,
+                    Message = "Guest is already a member of this chat room."
+                };
+            }
+
+            // ensure guest name provided
+            if (dto.GuestName is null)
+            {
+                return new ServiceResult<string>
+                {
+                    Succeeded = false,
+                    Message = "Guest name must be provided."
+                };
+            }
+
             // create
             var guestToken = Guid.NewGuid().ToString();
 
             var roomMember = new RoomMember
             {
                 RoomId = room.Id,
-                SenderName = guestName,
+                SenderName = dto.GuestName,
                 GuestToken = guestToken,
                 JoinedAt = DateTime.UtcNow
             };

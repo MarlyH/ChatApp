@@ -43,12 +43,12 @@ namespace ChatApp.API.Controllers
         [HttpPost("join-guest")]
         public async Task<IActionResult> CreateGuestRoomMember(string roomSlug, [FromBody] JoinRoomGuestRequest dto)
         {
-            var result = await _roomMemberService.JoinRoomGuestAsync(dto.GuestName, roomSlug);
+            var result = await _roomMemberService.JoinRoomGuestAsync(dto, roomSlug);
             if (!result.Succeeded)
             {
                 return BadRequest(new { message = result.Message });
             }
-            string guestToken = result.Data!;
+            string? guestToken = result.Data;
 
             return Ok(new { message = result.Message, guestToken });
         }
