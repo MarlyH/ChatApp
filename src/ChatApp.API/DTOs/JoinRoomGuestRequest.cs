@@ -2,9 +2,9 @@
 
 namespace ChatApp.API.DTOs
 {
-    public class JoinRoomRegisteredRequest
+    public class JoinRoomGuestRequest
     {
         [Required]
-        public required string Slug { get; set; }
+        public required string GuestName { get; set; }
     }
 }

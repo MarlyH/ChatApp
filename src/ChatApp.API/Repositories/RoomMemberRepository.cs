@@ -13,7 +13,7 @@ namespace ChatApp.API.Repositories
             _db = db;
         }
 
-        public async Task AddRegisteredRoomMemberAsync(RoomMember roomMember)
+        public async Task AddRoomMemberAsync(RoomMember roomMember)
         {
             await _db.RoomMembers.AddAsync(roomMember);
             await _db.SaveChangesAsync();
@@ -22,6 +22,11 @@ namespace ChatApp.API.Repositories
         public async Task<bool> IsUserRoomMemberAsync(Guid userId, Guid roomId)
         {
             return await _db.RoomMembers.AnyAsync(rm => rm.UserId == userId && rm.RoomId == roomId);
+        }
+
+        public async Task<bool> IsGuestRoomMemberAsync(string guestToken, Guid roomId)
+        {
+            return await _db.RoomMembers.AnyAsync(rm => rm.GuestToken == guestToken && rm.RoomId == roomId);
         }
 
         public async Task<RoomMember?> GetRegisteredRoomMemberAsync(Guid roomId, Guid userId)

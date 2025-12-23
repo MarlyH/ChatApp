@@ -24,16 +24,16 @@ namespace ChatApp.API.Services
         /// <summary>
         /// Joins a registered user to a chat room.
         /// </summary>
-        public async Task<ServiceResult> JoinRoomRegisteredAsync(AppUser user, string slug)
+        public async Task<ServiceResult> JoinRoomRegisteredAsync(AppUser user, string roomSlug)
         {
             // ensure room exists
-            ChatRoom? room = await _chatRoomRepository.GetRoomBySlugAsync(slug);
+            ChatRoom? room = await _chatRoomRepository.GetRoomBySlugAsync(roomSlug);
             if (room is null)
             {
                 return new ServiceResult
                 {
                     Succeeded = false,
-                    Message = "Chat room not found."
+                    Message = "Room must be provided."
                 };
             }
 
@@ -55,12 +55,46 @@ namespace ChatApp.API.Services
                 JoinedAt = DateTime.UtcNow,
                 SenderName =  user.UserName!
             };
-            await _roomMemberRepository.AddRegisteredRoomMemberAsync(newMember);
+            await _roomMemberRepository.AddRoomMemberAsync(newMember);
 
             return new ServiceResult
             {
                 Succeeded = true,
                 Message = $"User successfully joined the chat room {room.Name}."
+            };
+        }
+
+        public async Task<ServiceResult<string>> JoinRoomGuestAsync(string guestName, string roomSlug)
+        {
+            // ensure room exists
+            ChatRoom? room = await _chatRoomRepository.GetRoomBySlugAsync(roomSlug);
+            if (room is null)
+            {
+                return new ServiceResult<string>
+                {
+                    Succeeded = false,
+                    Message = "Room must be provided."
+                };
+            }
+
+            // create
+            var guestToken = Guid.NewGuid().ToString();
+
+            var roomMember = new RoomMember
+            {
+                RoomId = room.Id,
+                SenderName = guestName,
+                GuestToken = guestToken,
+                JoinedAt = DateTime.UtcNow
+            };
+
+            await _roomMemberRepository.AddRoomMemberAsync(roomMember);
+
+            return new ServiceResult<string>
+            {
+                Succeeded = true,
+                Message = $"Guest successfully joined the chat room {room.Name}.",
+                Data = guestToken
             };
         }
 

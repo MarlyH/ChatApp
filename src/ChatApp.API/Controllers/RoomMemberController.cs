@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace ChatApp.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/rooms/{roomSlug}")]
     [ApiController]
     public class RoomMemberController : ControllerBase
     {
@@ -22,8 +22,8 @@ namespace ChatApp.API.Controllers
         }
 
         [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> CreateRegisteredRoomMember([FromBody] JoinRoomRegisteredRequest dto)
+        [HttpPost("join")]
+        public async Task<IActionResult> CreateRegisteredRoomMember(string roomSlug)
         {
             var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             if (user is null) 
@@ -31,13 +31,26 @@ namespace ChatApp.API.Controllers
                 return Unauthorized(); 
             }
 
-            var result = await _roomMemberService.JoinRoomRegisteredAsync(user, dto.Slug);
+            var result = await _roomMemberService.JoinRoomRegisteredAsync(user, roomSlug);
             if (!result.Succeeded)
             {
                 return BadRequest(new { message = result.Message });
             }
 
             return Ok(new { message = result.Message });
+        }
+
+        [HttpPost("join-guest")]
+        public async Task<IActionResult> CreateGuestRoomMember(string roomSlug, [FromBody] JoinRoomGuestRequest dto)
+        {
+            var result = await _roomMemberService.JoinRoomGuestAsync(dto.GuestName, roomSlug);
+            if (!result.Succeeded)
+            {
+                return BadRequest(new { message = result.Message });
+            }
+            string guestToken = result.Data!;
+
+            return Ok(new { message = result.Message, guestToken });
         }
     }
 }
