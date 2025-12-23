@@ -19,13 +19,14 @@ export default function Chatroom() {
     const {roomSlug} = useParams<{ roomSlug: string }>();
 
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string>("");
+    const [error, setError] = useState<string | null>(null);
     const [roomDetails, setRoomDetails] = useState<GetRoomDetailsResponse>(
         {
             name: ""
         });
     const userContext = useContext(UserContext);
     const username = userContext?.user.username as string;
+    const isLoggedIn = userContext?.user.isLoggedIn as boolean;
     const [messages, setMessages] = useState<GetChatMessagesResponse[]>([]);
 
     const fetchRoomDetails = useCallback(async () => {
@@ -63,14 +64,78 @@ export default function Chatroom() {
         }
     }, [roomSlug]);
 
+    const checkJoinedRoom = useCallback(async () => {
+        try {
+            setIsLoading(true);
+
+            // handle logged-in user
+            if (isLoggedIn) {
+                const joinRoomRes = await fetch(`https://localhost:7073/api/rooms/${roomSlug}/join`, {
+                    method: 'POST',
+                    credentials: 'include',
+                });
+
+                if (!joinRoomRes.ok) {
+                    const data = await joinRoomRes.json();
+                    setError(data.message);
+                    return false;
+                }
+            } else {
+                // handle guest case, store guest token if newly-joined.
+                const token: string | null = localStorage.getItem('GuestToken');
+
+                const joinRoomRes = await fetch(`https://localhost:7073/api/rooms/${roomSlug}/join-guest`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        guestName: "Guest",
+                        guestToken: token
+                    })
+                });
+                const data = await joinRoomRes.json();
+
+                if (!joinRoomRes.ok) {
+                    setError(data.message);
+                    return false;
+                }
+
+                localStorage.setItem('GuestToken', data.guestToken);
+            }
+        } catch {
+            setError(`Unable to join room ${roomSlug}`);
+            return false;
+        } finally {
+            setIsLoading(false);
+        }
+
+        console.log("User is joined to room.");
+        return true;
+    }, [isLoggedIn, roomSlug]); 
+
     useEffect(() => {
+        // startup flow:
+        // user navigates to chatroom
+        // check user is joined, if not, automatically join them (resolve in one trip)
+        // load room details + load messages
         const load = async () => {
-            await fetchRoomDetails();
-            await fetchPastMessages();
+            const isJoinSuccess: boolean = await checkJoinedRoom();
+            if (!isJoinSuccess) {
+                return;
+            }
+
+            // run in parallel:
+            await Promise.all([
+                fetchRoomDetails(),
+                fetchPastMessages()
+            ]);
+
+            setError(null);
         };
 
         void load();
-    }, [fetchRoomDetails, fetchPastMessages]);
+    }, [fetchRoomDetails, fetchPastMessages, checkJoinedRoom]);
 
 
     useEffect(() => {
