@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import {SERVER_URL} from "../Constants.tsx";
 
 interface CreateChatMessageRequest {
     content: string;
@@ -14,7 +15,7 @@ export default function SendMessageInput({roomSlug} : {roomSlug: string}) {
     const sendChatMessage = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        await fetch(`https://localhost:7073/api/rooms/${roomSlug}/messages`, {
+        await fetch(`${SERVER_URL}/api/rooms/${roomSlug}/messages`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -3,6 +3,7 @@ import PasswordInput from "./PasswordInput.tsx";
 import React, {useContext, useState} from "react";
 import PersistenceInput from "./PersistenceInput.tsx";
 import {UserContext} from "../UserContext.tsx";
+import {SERVER_URL} from "../Constants.tsx";
 
 interface LoginRequest {
     username: string;
@@ -36,7 +37,7 @@ export default function LoginModal() {
         setLoading(true);
 
         try {
-            const loginRes = await fetch("https://localhost:7073/api/user/login", {
+            const loginRes = await fetch(`${SERVER_URL}/api/user/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form),
@@ -51,7 +52,7 @@ export default function LoginModal() {
             } else {
                 // login successful, fetch user profile.
                 try {
-                    const getProfileRes = await fetch("https://localhost:7073/api/user/me", {
+                    const getProfileRes = await fetch(`${SERVER_URL}/api/user/me`, {
                         credentials: "include"
                     });
 

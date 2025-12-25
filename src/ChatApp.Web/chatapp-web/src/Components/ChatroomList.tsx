@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
 import {Link} from "react-router";
+import {SERVER_URL} from "../Constants.tsx";
 
 interface GetRoomsResponse {
     id: string;
@@ -16,7 +17,7 @@ export default function ChatroomList() {
         setIsLoading(true);
 
         try {
-            const res = await fetch('https://localhost:7073/api/ChatRoom');
+            const res = await fetch(`${SERVER_URL}/api/ChatRoom`);
             const data = await res.json();
             const mappedData: GetRoomsResponse[] = data.map((chatroom: GetRoomsResponse) => ({
                 id: chatroom.id,

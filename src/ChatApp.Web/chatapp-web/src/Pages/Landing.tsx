@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import ChatroomList from "../Components/ChatroomList.tsx";
+import {SERVER_URL} from "../Constants.tsx";
 
 interface CreateRoomRequest {
     name: string;
@@ -18,7 +19,7 @@ export default function Landing() {
         setError(null);
 
         try {
-            const response = await fetch('https://localhost:7073/api/ChatRoom', {
+            const response = await fetch(`${SERVER_URL}/api/ChatRoom`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

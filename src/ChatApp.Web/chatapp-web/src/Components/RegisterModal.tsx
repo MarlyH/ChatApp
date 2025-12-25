@@ -2,6 +2,7 @@ import UsernameInput from "./UsernameInput.tsx";
 import EmailInput from "./EmailInput.tsx";
 import PasswordInput from "./PasswordInput.tsx";
 import {useState} from "react";
+import {SERVER_URL} from "../Constants.tsx";
 
 interface RegisterRequest {
     username: string;
@@ -32,7 +33,7 @@ export default function RegisterModal() {
         setLoading(true);
 
         try {
-            const registerRes = await fetch("https://localhost:7073/api/user/register", {
+            const registerRes = await fetch(`${SERVER_URL}/api/user/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form),
@@ -60,7 +61,7 @@ export default function RegisterModal() {
     const resendEmail = async () => {
         setLoading(true);
         try {
-            const res = await fetch('https://localhost:7073/api/User/resend-confirmation', {
+            const res = await fetch(`${SERVER_URL}/api/User/resend-confirmation`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -4,6 +4,7 @@ import { HubConnectionBuilder } from "@microsoft/signalr";
 import {UserContext} from "../UserContext.tsx";
 import SendMessageInput from "../Components/SendMessageInput.tsx";
 import Message from "../Components/Message.tsx";
+import {SERVER_URL} from "../Constants.tsx";
 
 interface GetRoomDetailsResponse {
     name: string;
@@ -33,7 +34,7 @@ export default function Chatroom() {
         setIsLoading(true);
 
         try {
-            const res = await fetch(`https://localhost:7073/api/ChatRoom/${roomSlug}`);
+            const res = await fetch(`${SERVER_URL}/api/ChatRoom/${roomSlug}`);
 
             if (res.status === 404) {
                 setError("Room Not Found");
@@ -50,7 +51,7 @@ export default function Chatroom() {
 
     const fetchPastMessages = useCallback(async () => {
         try {
-            const pastMessagesRes = await fetch(`https://localhost:7073/api/rooms/${roomSlug}/messages`);
+            const pastMessagesRes = await fetch(`${SERVER_URL}/api/rooms/${roomSlug}/messages`);
             if (!pastMessagesRes.ok) {
                 setError("Room Not Found");
             }
@@ -70,7 +71,7 @@ export default function Chatroom() {
 
             // handle logged-in user
             if (isLoggedIn) {
-                const joinRoomRes = await fetch(`https://localhost:7073/api/rooms/${roomSlug}/join`, {
+                const joinRoomRes = await fetch(`${SERVER_URL}/api/rooms/${roomSlug}/join`, {
                     method: 'POST',
                     credentials: 'include',
                 });
@@ -84,7 +85,7 @@ export default function Chatroom() {
                 // handle guest case, store guest token if newly-joined.
                 const token: string | null = localStorage.getItem('GuestToken');
 
-                const joinRoomRes = await fetch(`https://localhost:7073/api/rooms/${roomSlug}/join-guest`, {
+                const joinRoomRes = await fetch(`${SERVER_URL}/api/rooms/${roomSlug}/join-guest`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -140,7 +141,7 @@ export default function Chatroom() {
 
     useEffect(() => {
         const hubConn = new HubConnectionBuilder()
-            .withUrl("https://localhost:7073/chathub")
+            .withUrl(`${SERVER_URL}/chathub`)
             .withAutomaticReconnect()
             .build();
 
