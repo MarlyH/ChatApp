@@ -55,6 +55,21 @@ namespace ChatApp.API.Controllers
             return Ok(result.Data);
         }
 
+        [Authorize]
+        [HttpGet("rooms")]
+        public async Task<IActionResult> GetUserRooms()
+        {
+            var result = await _userService.GetUserRoomsAsync(User);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(new { message = result.Message });
+            }
+
+            return Ok(result.Data);
+        }
+
+
         [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {

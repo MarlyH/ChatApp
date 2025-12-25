@@ -1,4 +1,5 @@
-﻿using ChatApp.Domain.Models;
+﻿using ChatApp.API.Models;
+using ChatApp.Domain.Models;
 using ChatApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -33,6 +34,14 @@ namespace ChatApp.API.Repositories
         public async Task<ChatRoom?> GetRoomBySlugAsync(string slug)
         {
             return await _db.ChatRooms.FirstOrDefaultAsync(r => r.Slug == slug);
+        }
+
+        public async Task<List<ChatRoom>> GetRoomsByUserAsync(AppUser user)
+        {
+            return await _db.RoomMembers
+                .Where(rm => rm.UserId == user.Id)
+                .Select(rm => rm.Room)
+                .ToListAsync();
         }
 
         public async Task<ChatRoom?> GetRoomWithMessagesBySlugAsync(string slug)

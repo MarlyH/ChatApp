@@ -1,5 +1,7 @@
 ﻿using ChatApp.API.DTOs;
 using ChatApp.API.Models;
+using ChatApp.API.Repositories;
+using ChatApp.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
@@ -12,13 +14,15 @@ namespace ChatApp.API.Services
         private readonly IConfiguration _configuration;
         private readonly EmailService _emailService;
         private readonly ILogger<UserService> _logger;
+        private readonly ChatRoomRepository _chatRoomRepository;
 
         public UserService(
             UserManager<AppUser> userManager, 
             SignInManager<AppUser> signInManager, 
             IConfiguration configuration,
             EmailService emailService,
-            ILogger<UserService> logger
+            ILogger<UserService> logger,
+            ChatRoomRepository chatRoomRepository
             )
         {
             _userManager = userManager;
@@ -26,6 +30,7 @@ namespace ChatApp.API.Services
             _configuration = configuration;
             _emailService = emailService;
             _logger = logger;
+            _chatRoomRepository = chatRoomRepository;
         }
 
         /// <summary>
@@ -126,6 +131,35 @@ namespace ChatApp.API.Services
                     Username = appUser.UserName!,
                     Email = appUser.Email!
                 }
+            };
+        }
+
+        public async Task<ServiceResult<List<GetRoomsResponse>>> GetUserRoomsAsync(ClaimsPrincipal userClaims)
+        {
+            var appUser = await _userManager.GetUserAsync(userClaims);
+
+            if (appUser is null)
+            {
+                return new ServiceResult<List<GetRoomsResponse>>
+                {
+                    Succeeded = false,
+                    Message = "User not found."
+                };
+            }
+
+            List<ChatRoom> rooms = await _chatRoomRepository.GetRoomsByUserAsync(appUser);
+            var dto = rooms.Select(r => new GetRoomsResponse
+            {
+                Id = r.Id,
+                Name = r.Name,
+                Slug = r.Slug,
+            })
+                .ToList();
+
+            return new ServiceResult<List<GetRoomsResponse>>
+            {
+                Succeeded = true,
+                Data = dto
             };
         }
 
