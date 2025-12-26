@@ -1,5 +1,6 @@
 ﻿using ChatApp.API.DTOs;
 using ChatApp.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.API.Controllers
@@ -15,6 +16,7 @@ namespace ChatApp.API.Controllers
             _chatRoomService = chatRoomService;
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateRoom([FromBody] CreateRoomRequest dto)
         {

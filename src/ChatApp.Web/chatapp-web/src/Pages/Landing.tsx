@@ -1,6 +1,7 @@
-import React, {useState} from 'react'
+import React, {useContext, useState} from 'react'
 import ChatroomList from "../Components/ChatroomList.tsx";
 import {SERVER_URL} from "../Constants.tsx";
+import {UserContext} from "../UserContext.tsx";
 
 interface CreateRoomRequest {
     name: string;
@@ -12,6 +13,7 @@ export default function Landing() {
     const [form, setForm] = useState<CreateRoomRequest>({name: "", isPrivate: false});
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const userContext = useContext(UserContext);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -51,38 +53,39 @@ export default function Landing() {
         <div>
             <ChatroomList />
 
-            <h1>Landing</h1>
+            {userContext?.user.isLoggedIn && (
+                !showForm ? (
+                    <>
+                        <button
+                            onClick={() => setShowForm(true)}
+                            className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg shadow-md hover:bg-teal-700 transition-colors duration-200 hover:cursor-pointer"
+                        >
+                            New Chatroom
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        {error !== null && (
+                            <p className="text-red-500">{error}</p>
+                        )}
 
-            {!showForm ? (
-                <>
-                    <button
-                        onClick={() => setShowForm(true)}
-                        className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg shadow-md hover:bg-teal-700 transition-colors duration-200 hover:cursor-pointer"
-                    >
-                        New Chatroom
-                    </button>
-                </>
-            ) : (
-                <>
-                    {error !== null && (
-                        <p className="text-red-500">{error}</p>
-                    )}
-                    <form
-                        onSubmit={handleSubmit}
-                        className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg"
-                    >
-                        <label className="me-2">Name:</label>
-                        <input type="text" id="name" name="name" value={form.name} onChange={handleChange}/>
+                        <form
+                            onSubmit={handleSubmit}
+                            className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg"
+                        >
+                            <label className="me-2">Name:</label>
+                            <input type="text" id="name" name="name" value={form.name} onChange={handleChange}/>
 
-                        <label className="mx-2">IsPrivate</label>
-                        <input type="checkbox" id="isPrivate" name="isPrivate" checked={form.isPrivate} onChange={handleChange} />
+                            <label className="mx-2">IsPrivate</label>
+                            <input type="checkbox" id="isPrivate" name="isPrivate" checked={form.isPrivate} onChange={handleChange} />
 
-                        <button type="submit" className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg">Create</button>
-                    </form>
-                    {loading && (
-                        <h2>Loading...</h2>
-                    )}
-                </>
+                            <button type="submit" className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg">Create</button>
+                        </form>
+                        {loading && (
+                            <h2>Loading...</h2>
+                        )}
+                    </>
+                )
             )}
         </div>
     )
