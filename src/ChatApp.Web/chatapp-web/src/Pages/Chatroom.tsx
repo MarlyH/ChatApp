@@ -197,7 +197,7 @@ export default function Chatroom() {
                         {roomDetails.name}
                     </h1>
 
-                    <ChatroomMessageList messages={messages} />
+                    <ChatroomMessageList messages={messages} roomSlug={roomSlug as string} />
 
                     <SendMessageInput roomSlug={roomSlug as string} />
                 </div>

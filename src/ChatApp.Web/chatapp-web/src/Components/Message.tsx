@@ -1,7 +1,15 @@
 import type {GetChatMessagesResponse} from "../Pages/Chatroom.tsx";
 /*import formatChatTimestamp from "../Helpers/FormatChatTimestamp.tsx";*/
 
-export default function Message({index, username, message } : {index: number; username: string; message: GetChatMessagesResponse }) {
+interface MessageProps {
+    index: number;
+    username: string;
+    message: GetChatMessagesResponse;
+    roomSlug: string;
+}
+
+export default function Message({index, username, message, roomSlug } : MessageProps)
+{
     const isUserMessage = message.senderUsername === username;
 
     const handleDelete = async (id: string) => {

@@ -5,7 +5,13 @@ import Message from "./Message.tsx";
 import {useContext, useEffect, useRef} from "react";
 import {UserContext} from "../UserContext.tsx";
 
-export default function ChatroomMessageList({messages}: {messages: GetChatMessagesResponse[]}) {
+interface ChatroomMessageListProps {
+    messages: GetChatMessagesResponse[];
+    roomSlug: string;
+}
+
+export default function ChatroomMessageList({messages, roomSlug}: ChatroomMessageListProps)
+{
     const bottomOfChatbox = useRef<HTMLDivElement | null>(null);
     const userContext = useContext(UserContext);
     const username = userContext?.user.username as string;
@@ -28,7 +34,7 @@ export default function ChatroomMessageList({messages}: {messages: GetChatMessag
                     return (
                         <div key={index}>
                             {showTime && <ChatTimeBreak timestamp={msgDate} />}
-                            <Message index={index} username={username} message={message} />
+                            <Message index={index} username={username} message={message} roomSlug={roomSlug} />
                         </div>
                     );
                 });
