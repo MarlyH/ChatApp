@@ -6,7 +6,7 @@ namespace ChatApp.API.DTOs
     {
         [Required]
         [MinLength(1)]
-        [MaxLength(255)]
+        [MaxLength(2000)]
         public required string Content { get; set; }
         public string? GuestToken { get; set; }
     }
