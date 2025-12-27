@@ -3,6 +3,17 @@ export default function formatChatTimestamp(isoUtc: Date | string): string {
     const date: Date = new Date(isoUtc);
     // "2025-12-22T03:59:49.797Z"
 
+    if (isToday(date)) {
+        const todayOptions: Intl.DateTimeFormatOptions = {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        }
+        // "4:59 PM"
+
+        return date.toLocaleString(undefined, todayOptions);
+    }
+
     const options: Intl.DateTimeFormatOptions = {
         year: 'numeric',
         month: 'short',
@@ -12,17 +23,6 @@ export default function formatChatTimestamp(isoUtc: Date | string): string {
         hour12: true
     };
     // "22 Dec 2025, 4:59 PM"
-
-    if (isToday(date)) {
-        const todayOptions: Intl.DateTimeFormatOptions = {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        }
-
-        // "4:59 PM"
-        return date.toLocaleString(undefined, todayOptions);
-    }
 
     return date.toLocaleString(undefined, options);
 }
