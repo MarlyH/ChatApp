@@ -1,5 +1,5 @@
 import {useParams} from "react-router";
-import {useCallback, useContext, useEffect, useState} from "react";
+import {useCallback, useContext, useEffect, useRef, useState} from "react";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import {UserContext} from "../UserContext.tsx";
 import SendMessageInput from "../Components/SendMessageInput.tsx";
@@ -18,7 +18,6 @@ export interface GetChatMessagesResponse {
 
 export default function Chatroom() {
     const {roomSlug} = useParams<{ roomSlug: string }>();
-
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [roomDetails, setRoomDetails] = useState<GetRoomDetailsResponse>(
@@ -29,6 +28,7 @@ export default function Chatroom() {
     const username = userContext?.user.username as string;
     const isLoggedIn = userContext?.user.isLoggedIn as boolean;
     const [messages, setMessages] = useState<GetChatMessagesResponse[]>([]);
+    const bottomOfChatbox = useRef<HTMLDivElement | null>(null);
 
     const fetchRoomDetails = useCallback(async () => {
         setIsLoading(true);
@@ -138,6 +138,10 @@ export default function Chatroom() {
         void load();
     }, [fetchRoomDetails, fetchPastMessages, checkJoinedRoom]);
 
+    // auto scroll to bottom of page when new message sent/received
+    useEffect(() => {
+        bottomOfChatbox.current?.scrollIntoView(true);
+    }, [messages]);
 
     useEffect(() => {
         const hubConn = new HubConnectionBuilder()
@@ -194,7 +198,7 @@ export default function Chatroom() {
                         ))}
                     </div>
 
-                    <div className={"w-full"}>
+                    <div className={"w-full"} ref={bottomOfChatbox}>
                         <SendMessageInput roomSlug={roomSlug as string} />
                     </div>
                 </div>
