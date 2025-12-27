@@ -2,6 +2,7 @@
 using ChatApp.API.Hubs;
 using ChatApp.API.Repositories;
 using ChatApp.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ChatApp.API.Services
@@ -65,6 +66,7 @@ namespace ChatApp.API.Services
             // broadcast to the room's SignalR hub group
             await _hubContext.Clients.Group(roomSlug).SendAsync("MessageReceived", new GetChatMessageResponse
             {
+                Id = msg.Id,
                 Content = msg.Content,
                 SenderUsername = roomMember.SenderName,
                 CreatedAt = msg.CreatedAt
@@ -93,6 +95,7 @@ namespace ChatApp.API.Services
                 .Select(m => 
                     new GetChatMessageResponse
                     {
+                        Id = m.Id,
                         Content = m.Content,
                         CreatedAt = m.CreatedAt,
                         SenderUsername = m.Sender!.SenderName
@@ -104,6 +107,29 @@ namespace ChatApp.API.Services
             {
                 Succeeded = true,
                 Data = messages
+            };
+        }
+
+        [Authorize]
+        public async Task<ServiceResult> DeleteMessageAsync(Guid messageId, string roomSlug)
+        {
+            var succeeded = await _chatMsgRepository.DeleteMessageAsync(messageId);
+            if (!succeeded)
+            {
+                return new ServiceResult
+                {
+                    Message = "Message not found",
+                    Succeeded = false
+                };
+            }
+
+            // after successful delete, broadcast to the room's SignalR hub group
+            await _hubContext.Clients.Group(roomSlug).SendAsync("MessageDeleted", messageId);
+
+            return new ServiceResult
+            {
+                Message = "Message successfully deleted",
+                Succeeded = true
             };
         }
     }

@@ -4,6 +4,22 @@ import type {GetChatMessagesResponse} from "../Pages/Chatroom.tsx";
 export default function Message({index, username, message } : {index: number; username: string; message: GetChatMessagesResponse }) {
     const isUserMessage = message.senderUsername === username;
 
+    const handleDelete = async (id: string) => {
+        try {
+            console.log("attempting to delete " + id);
+            const deleteRes = await fetch(`https://localhost:7073/api/rooms/${roomSlug}/messages?messageId=${id}`, {
+                method: 'DELETE',
+                credentials: "include"
+            });
+
+            if (!deleteRes.ok) {
+                // TODO: handle bad msgId provided
+            }
+        } catch {
+            // TODO: handle
+        }
+    }
+
     return (
         <>
             <div key={index}
@@ -38,7 +54,7 @@ export default function Message({index, username, message } : {index: number; us
                               group-hover:opacity-100 group-hover:pointer-events-auto
                               transition z-50">
                                 <button className="w-full text-left px-3 py-1 hover:bg-base-300">Edit</button>
-                                <button className="w-full text-left px-3 py-1 hover:bg-base-300">Delete</button>
+                                <button onClick={() => handleDelete(message.id)} className="w-full text-left px-3 py-1 hover:bg-base-300">Delete</button>
                                 <button className="w-full text-left px-3 py-1 hover:bg-base-300">React</button>
                             </div>
                         </div>

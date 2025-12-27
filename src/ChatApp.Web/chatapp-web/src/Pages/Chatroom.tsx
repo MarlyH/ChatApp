@@ -11,6 +11,7 @@ interface GetRoomDetailsResponse {
 }
 
 export interface GetChatMessagesResponse {
+    id: string;
     content: string;
     createdAt: string;
     senderUsername: string;
@@ -151,6 +152,13 @@ export default function Chatroom() {
         hubConn.on("UserJoined", message => {
             console.log(message);
         });
+
+        // remove a message from the list when it is deleted
+        hubConn.on("MessageDeleted", (messageId: string) => {
+            setMessages(prev =>
+                prev.filter(msg => msg.id !== messageId)
+            );
+        })
 
         // join the hub group associated with this chatroom.
         hubConn.start()

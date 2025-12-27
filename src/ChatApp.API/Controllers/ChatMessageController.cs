@@ -46,5 +46,17 @@ namespace ChatApp.API.Controllers
 
             return Ok(result.Data);
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteMessage(string roomSlug, Guid messageId)
+        {
+            var result = await _chatMsgService.DeleteMessageAsync(messageId, roomSlug);
+            if (!result.Succeeded)
+            {
+                return NotFound(new { message = result.Message });
+            }
+
+            return Ok();
+        }
     }
 }
