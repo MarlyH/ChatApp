@@ -5,6 +5,8 @@ import {UserContext} from "../UserContext.tsx";
 import SendMessageInput from "../Components/SendMessageInput.tsx";
 import Message from "../Components/Message.tsx";
 import {SERVER_URL} from "../Constants.tsx";
+import ChatTimeBreak from "../Components/ChatTimeBreak.tsx";
+import {isTimeBreak} from "../Helpers/FormatChatTimestamp.tsx";
 
 interface GetRoomDetailsResponse {
     name: string;
@@ -177,6 +179,7 @@ export default function Chatroom() {
         };
     }, [roomSlug, username]);
 
+    let lastTimestamp: Date | null = null;
     return (
         <>
             {isLoading && (
@@ -187,6 +190,7 @@ export default function Chatroom() {
                 <p>{error}</p>
             )}
 
+
             {!isLoading && (
                 <div className="h-screen flex flex-col">
 
@@ -195,24 +199,27 @@ export default function Chatroom() {
                     </h1>
 
                     <div className="flex-1 overflow-y-auto w-full px-4">
-                        {messages.map((message, index) => (
-                            <Message
-                                key={index}
-                                index={index}
-                                username={username}
-                                message={message}
-                            />
-                        ))}
+                        {messages.map((message, index) => {
+                            const msgDate = new Date(message.createdAt);
+
+                            const showTime: boolean = isTimeBreak(lastTimestamp, msgDate);
+                            lastTimestamp = msgDate;
+
+                            return (
+                                <div key={index}>
+                                    {showTime && <ChatTimeBreak timestamp={msgDate} />}
+                                    <Message index={index} username={username} message={message} />
+                                </div>
+                            );
+                        })}
                         <div ref={bottomOfChatbox} />
                     </div>
 
                     <div className="w-full shrink-0">
                         <SendMessageInput roomSlug={roomSlug as string} />
                     </div>
-
                 </div>
             )}
-
         </>
     )
 }

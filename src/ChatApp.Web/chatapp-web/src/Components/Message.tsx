@@ -1,4 +1,5 @@
 import type {GetChatMessagesResponse} from "../Pages/Chatroom.tsx";
+/*import formatChatTimestamp from "../Helpers/FormatChatTimestamp.tsx";*/
 
 export default function Message({index, username, message } : {index: number; username: string; message: GetChatMessagesResponse }) {
     return (
@@ -18,7 +19,7 @@ export default function Message({index, username, message } : {index: number; us
                 </div>
                 <div className="chat-header">
                     {message.senderUsername}
-                    <time className="text-xs opacity-50">{message.createdAt}</time>
+                    {/*<time className="text-xs opacity-50">{formatChatTimestamp(message.createdAt)}</time>*/}
                 </div>
                 <div className="chat-bubble">{message.content}</div>
                 <div className="chat-footer opacity-50">Delivered</div>
