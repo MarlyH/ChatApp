@@ -179,7 +179,6 @@ export default function Chatroom() {
         };
     }, [roomSlug, username]);
 
-    let lastTimestamp: Date | null = null;
     return (
         <>
             {isLoading && (
@@ -199,25 +198,25 @@ export default function Chatroom() {
                     </h1>
 
                     <div className="flex-1 overflow-y-auto w-full px-4">
-                        {messages.map((message, index) => {
-                            const msgDate = new Date(message.createdAt);
+                        {(() => {
+                            let lastTimestamp: Date | null = null;
+                            return messages.map((message, index) => {
+                                const msgDate = new Date(message.createdAt);
+                                const showTime = isTimeBreak(lastTimestamp, msgDate);
+                                lastTimestamp = msgDate;
 
-                            const showTime: boolean = isTimeBreak(lastTimestamp, msgDate);
-                            lastTimestamp = msgDate;
-
-                            return (
-                                <div key={index}>
-                                    {showTime && <ChatTimeBreak timestamp={msgDate} />}
-                                    <Message index={index} username={username} message={message} />
-                                </div>
-                            );
-                        })}
+                                return (
+                                    <div key={index}>
+                                        {showTime && <ChatTimeBreak timestamp={msgDate} />}
+                                        <Message index={index} username={username} message={message} />
+                                    </div>
+                                );
+                            });
+                        })()}
                         <div ref={bottomOfChatbox} />
                     </div>
 
-                    <div className="w-full shrink-0">
-                        <SendMessageInput roomSlug={roomSlug as string} />
-                    </div>
+                    <SendMessageInput roomSlug={roomSlug as string} />
                 </div>
             )}
         </>

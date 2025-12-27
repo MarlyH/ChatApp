@@ -32,21 +32,23 @@ export default function SendMessageInput({roomSlug} : {roomSlug: string}) {
     }
 
     return (
-        <form onSubmit={sendChatMessage}>
-            <input
-                type="text"
-                placeholder="Type here"
-                className="input w-full"
-                value={messageDto?.content}
-                name={"content"}
-                onChange={(e) =>
-                    setMessageDto(prev => ({
-                        ...prev,
-                        content: e.target.value
-                    }))
-                }
-            />
-            <button type="submit" hidden={true}></button>
-        </form>
+        <div className="w-full shrink-0">
+            <form onSubmit={sendChatMessage}>
+                <input
+                    type="text"
+                    placeholder="Type here"
+                    className="input w-full"
+                    value={messageDto?.content}
+                    name={"content"}
+                    onChange={(e) =>
+                        setMessageDto(prev => ({
+                            ...prev,
+                            content: e.target.value
+                        }))
+                    }
+                />
+                <button type="submit" hidden={true}></button>
+            </form>
+        </div>
     )
 }
