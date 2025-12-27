@@ -188,21 +188,31 @@ export default function Chatroom() {
             )}
 
             {!isLoading && (
-                <div className="max-w-full flex flex-col items-center">
+                <div className="h-screen flex flex-col">
 
-                    <h1 className="text-4xl font-bold tracking-tight text-base-content/95 m-4">{roomDetails.name}</h1>
+                    <h1 className="text-4xl font-bold tracking-tight text-base-content/95 m-4 shrink-0">
+                        {roomDetails.name}
+                    </h1>
 
-                    <div className={"w-full"}>
+                    <div className="flex-1 overflow-y-auto w-full px-4">
                         {messages.map((message, index) => (
-                            <Message index={index} username={username} message={message} />
+                            <Message
+                                key={index}
+                                index={index}
+                                username={username}
+                                message={message}
+                            />
                         ))}
+                        <div ref={bottomOfChatbox} />
                     </div>
 
-                    <div className={"w-full"} ref={bottomOfChatbox}>
+                    <div className="w-full shrink-0">
                         <SendMessageInput roomSlug={roomSlug as string} />
                     </div>
+
                 </div>
             )}
+
         </>
     )
 }

@@ -11,10 +11,13 @@ function App() {
           <UserProvider>
               <div className="flex flex-col h-screen">
                   <NavBar />
-                  <Routes>
-                      <Route path="/" Component={Landing}  />
-                      <Route path="/room/:roomSlug" Component={Chatroom} />
-                  </Routes>
+
+                  <div className="flex-1 overflow-hidden">
+                      <Routes>
+                          <Route path="/" Component={Landing} />
+                          <Route path="/room/:roomSlug" Component={Chatroom} />
+                      </Routes>
+                  </div>
               </div>
           </UserProvider>
       </>
