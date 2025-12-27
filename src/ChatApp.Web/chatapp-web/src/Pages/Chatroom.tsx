@@ -1,12 +1,10 @@
 import {useParams} from "react-router";
-import {useCallback, useContext, useEffect, useRef, useState} from "react";
+import {useCallback, useContext, useEffect, useState} from "react";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import {UserContext} from "../UserContext.tsx";
 import SendMessageInput from "../Components/SendMessageInput.tsx";
-import Message from "../Components/Message.tsx";
 import {SERVER_URL} from "../Constants.tsx";
-import ChatTimeBreak from "../Components/ChatTimeBreak.tsx";
-import {isTimeBreak} from "../Helpers/FormatChatTimestamp.tsx";
+import ChatroomMessageList from "../Components/ChatroomMessageList.tsx";
 
 interface GetRoomDetailsResponse {
     name: string;
@@ -30,7 +28,6 @@ export default function Chatroom() {
     const username = userContext?.user.username as string;
     const isLoggedIn = userContext?.user.isLoggedIn as boolean;
     const [messages, setMessages] = useState<GetChatMessagesResponse[]>([]);
-    const bottomOfChatbox = useRef<HTMLDivElement | null>(null);
 
     const fetchRoomDetails = useCallback(async () => {
         setIsLoading(true);
@@ -140,11 +137,6 @@ export default function Chatroom() {
         void load();
     }, [fetchRoomDetails, fetchPastMessages, checkJoinedRoom]);
 
-    // auto scroll to bottom of page when new message sent/received
-    useEffect(() => {
-        bottomOfChatbox.current?.scrollIntoView(true);
-    }, [messages]);
-
     useEffect(() => {
         const hubConn = new HubConnectionBuilder()
             .withUrl(`${SERVER_URL}/chathub`)
@@ -197,24 +189,7 @@ export default function Chatroom() {
                         {roomDetails.name}
                     </h1>
 
-                    <div className="flex-1 overflow-y-auto w-full px-4">
-                        {(() => {
-                            let lastTimestamp: Date | null = null;
-                            return messages.map((message, index) => {
-                                const msgDate = new Date(message.createdAt);
-                                const showTime = isTimeBreak(lastTimestamp, msgDate);
-                                lastTimestamp = msgDate;
-
-                                return (
-                                    <div key={index}>
-                                        {showTime && <ChatTimeBreak timestamp={msgDate} />}
-                                        <Message index={index} username={username} message={message} />
-                                    </div>
-                                );
-                            });
-                        })()}
-                        <div ref={bottomOfChatbox} />
-                    </div>
+                    <ChatroomMessageList messages={messages} />
 
                     <SendMessageInput roomSlug={roomSlug as string} />
                 </div>
