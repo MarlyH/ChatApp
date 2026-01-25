@@ -1,19 +1,18 @@
 import React, {useState} from "react";
 import {SERVER_URL} from "../Constants.tsx";
 
-interface CreateChatMessageRequest {
-    content: string;
-    guestToken: string | null;
-}
-
 export default function SendMessageInput({roomSlug} : {roomSlug: string}) {
-    const [messageDto, setMessageDto] = useState<CreateChatMessageRequest>({
-        content: "",
-        guestToken: null
-    });
+    const [content, setContent] = useState("");
 
     const sendChatMessage = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const payload = {
+            guestToken: localStorage.getItem('GuestToken'),
+            content
+        }
+
+        console.log(payload);
 
         await fetch(`${SERVER_URL}/api/rooms/${roomSlug}/messages`, {
             method: 'POST',
@@ -21,14 +20,11 @@ export default function SendMessageInput({roomSlug} : {roomSlug: string}) {
                 'Content-Type': 'application/json'
             },
             credentials: 'include',
-            body: JSON.stringify(messageDto)
+            body: JSON.stringify(payload)
         });
 
         // clear message input after sending
-        setMessageDto(prev => ({
-            ...prev,
-            content: ""
-        }))
+        setContent("");
     }
 
     return (
@@ -38,13 +34,10 @@ export default function SendMessageInput({roomSlug} : {roomSlug: string}) {
                     type="text"
                     placeholder="Type here"
                     className="input w-full"
-                    value={messageDto?.content}
+                    value={content}
                     name={"content"}
                     onChange={(e) =>
-                        setMessageDto(prev => ({
-                            ...prev,
-                            content: e.target.value
-                        }))
+                        setContent(e.target.value)
                     }
                 />
                 <button type="submit" hidden={true}></button>

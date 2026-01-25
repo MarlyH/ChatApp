@@ -110,9 +110,9 @@ namespace ChatApp.API.Services
             };
         }
 
-        [Authorize]
         public async Task<ServiceResult> DeleteMessageAsync(Guid messageId, string roomSlug)
         {
+            // TODO: ensure the roomMember is the message sender
             var succeeded = await _chatMsgRepository.DeleteMessageAsync(messageId);
             if (!succeeded)
             {
